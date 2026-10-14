@@ -1,6 +1,7 @@
 services:
   - type: web
     name: burewala-tutor-marketplace
+    plan: free
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --workers 2 --threads 4 --timeout 120 app:app
