@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Parent Dashboard — Burewala Tutor Marketplace{% endblock %}
+{% block page_title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 24px;">
+  <div>
+    <div class="breadcrumb">Parent Portal / <span>Dashboard</span></div>
+    <h1>Parent Dashboard</h1>
+    <p class="muted">Manage your tuition requests, track tutor matching progress, and view verified teacher introductions.</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ url_for('main.parent_request_new') }}" style="display: inline-flex; align-items: center; gap: 6px;">
+      <span>➕</span> Request a New Tutor
+    </a>
+  </div>
+</div>
+
+<!-- Parent Stats Grid -->
+<div class="stats-grid" style="margin-bottom: 28px;">
+  <div class="stat-card">
+    <div class="stat-icon blue">📋</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ requests_list|length }}</div>
+      <div class="stat-label">Total Requests</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⏳</div>
+    <div class="stat-info">
+      <div class="stat-value">
+        {{ requests_list|selectattr('status', 'in', ['New request', 'Reviewed', 'Matching', 'Tutor interested'])|list|length }}
+      </div>
+      <div class="stat-label">Matching in Progress</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">🤝</div>
+    <div class="stat-info">
+      <div class="stat-value">
+        {{ requests_list|selectattr('status', 'in', ['Demo arranged', 'Confirmed', 'Active tuition'])|list|length }}
+      </div>
+      <div class="stat-label">Active / Placed</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-info">
+      <div class="stat-value">
+        {{ requests_list|selectattr('status', 'equalto', 'Completed')|list|length }}
+      </div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- Requests Table Section -->
+<section class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">Your Tuition Requests</h2>
+      <p class="muted" style="font-size: 0.85rem;">Contact details and home locations are kept private until our team authorizes an introduction.</p>
+    </div>
+    <a href="{{ url_for('main.parent_request_new') }}" class="btn btn-sm btn-secondary">
+      + New Request
+    </a>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 16%;">Reference ID</th>
+          <th style="width: 26%;">Subject & Class</th>
+          <th style="width: 20%;">Burewala Area</th>
+          <th style="width: 18%;">Matching Status</th>
+          <th style="width: 10%;">Submitted</th>
+          <th style="width: 10%; text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests_list %}
+        <tr>
+          <td>
+            <strong style="color: var(--primary); font-family: monospace; font-size: 0.95rem;">
+              {{ r.public_ref }}
+            </strong>
+          </td>
+          <td>
+            <strong>{{ r.subject.name }}</strong>
+            <small class="muted" style="display: block;">Class: {{ r.school_class.name }} · {{ r.mode.name }}</small>
+          </td>
+          <td>
+            <span>{{ r.area.name }}</span>
+            {% if r.subarea_text %}
+            <small class="muted" style="display: block;">Near: {{ r.subarea_text }}</small>
+            {% endif %}
+          </td>
+          <td>
+            {% if r.status in ['Confirmed', 'Active tuition'] %}
+              <span class="badge badge-success">{{ r.status }}</span>
+            {% elif r.status in ['Demo arranged', 'Tutor interested'] %}
+              <span class="badge badge-info">{{ r.status }}</span>
+            {% elif r.status in ['Matching', 'New request', 'Reviewed'] %}
+              <span class="badge badge-warning">{{ r.status }}</span>
+            {% elif r.status in ['Cancelled', 'Rejected'] %}
+              <span class="badge badge-danger">{{ r.status }}</span>
+            {% else %}
+              <span class="badge badge-gray">{{ r.status }}</span>
+            {% endif %}
+          </td>
+          <td style="color: var(--muted); font-size: 0.82rem;">
+            {{ r.created_at.strftime('%d %b %Y') }}
+          </td>
+          <td style="text-align: right;">
+            <a href="{{ url_for('main.parent_request_detail', request_id=r.id) }}" class="btn btn-sm btn-secondary" style="padding: 5px 12px; font-size: 0.8rem;">
+              View Case
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="empty">
+            <div style="padding: 32px 16px; text-align: center;">
+              <div style="font-size: 2.2rem; margin-bottom: 8px;">📚</div>
+              <h3 style="font-size: 1.1rem; margin-bottom: 6px;">No Tuition Requests Yet</h3>
+              <p class="muted" style="font-size: 0.88rem; max-width: 440px; margin: 0 auto 16px;">
+                Submit a tuition request for any class or subject in Burewala. Our team will verify and match top qualified tutors.
+              </p>
+              <a href="{{ url_for('main.parent_request_new') }}" class="btn btn-primary">
+                + Submit Your First Request
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% block title %}Areas & Business Options{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 24px;">
+  <div class="breadcrumb">Admin / <span>Areas & Settings</span></div>
+  <h1>Areas & Business Options</h1>
+  <p class="muted">Manage Burewala geographic coverage, neighboring area relationships, subjects, school classes, and teaching modes.</p>
+</div>
+
+<!-- SECTION 1: ADD NEW BUSINESS OPTION -->
+<section class="panel" style="margin-bottom: 28px;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">Add New Business Option</h2>
+      <p class="muted" style="font-size: 0.85rem;">Create a new location, academic subject, class level, or teaching mode.</p>
+    </div>
+  </div>
+  <form method="post" action="{{ url_for('superadmin.catalog_settings' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.catalog_settings') }}" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="create">
+    
+    <label>
+      Type
+      <select name="kind" required>
+        {% for kind in kinds %}
+        <option value="{{ kind }}" {% if kind == 'area' %}selected{% endif %}>{{ kind|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Name / Title
+      <input name="name" required maxlength="100" placeholder="e.g. Satellite Town, Biology, etc.">
+    </label>
+
+    <label>
+      Parent Location (Optional)
+      <select name="parent_id">
+        <option value="">No parent (Top level)</option>
+        {% for p in possible_parents %}
+        <option value="{{ p.id }}">{{ p.kind|title }}: {{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Display Order
+      <input type="number" name="sort_order" value="0" min="0">
+    </label>
+
+    <div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; height: 42px;">
+        + Add Option
+      </button>
+    </div>
+  </form>
+</section>
+
+<!-- SECTION: MARKETPLACE TUITION FEE & BUDGET CONTROL -->
+<section class="panel" style="margin-bottom: 28px; border-left: 4px solid #4f46e5;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+        <span>💰</span> Marketplace Tuition Fee &amp; Budget Control
+      </h2>
+      <p class="muted" style="font-size: 0.85rem;">
+        Control the standard monthly tuition fee rates for Burewala. Changes here instantly update the pre-filled defaults, placeholders, and guidance across all Parent Request Forms and Tutor Registration Forms.
+      </p>
+    </div>
+    <span class="badge badge-success" style="font-size: 0.85rem; padding: 6px 12px;">
+      Active Rate: PKR {{ "{:,}".format(budget_settings.min) }} – {{ "{:,}".format(budget_settings.max) }} / mo
+    </span>
+  </div>
+
+  <form method="post" action="{{ url_for('superadmin.catalog_settings' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.catalog_settings') }}" style="background: #f8fafc; padding: 20px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="update_budget">
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: end;">
+      <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.88rem; color: var(--text);">
+        <span>Minimum Monthly Budget (PKR)</span>
+        <input type="number" name="default_budget_min" value="{{ budget_settings.min }}" min="1000" step="500" required style="padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; font-weight: 600;">
+        <small style="color: #64748b; font-size: 0.78rem;">Default min budget for parents &amp; tutors (Current: PKR 7,000)</small>
+      </label>
+
+      <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.88rem; color: var(--text);">
+        <span>Maximum Monthly Budget (PKR)</span>
+        <input type="number" name="default_budget_max" value="{{ budget_settings.max }}" min="1000" step="500" required style="padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; font-weight: 600;">
+        <small style="color: #64748b; font-size: 0.78rem;">Default max budget for parents &amp; tutors (Current: PKR 10,000)</small>
+      </label>
+
+      <div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          💾 Save Marketplace Budget
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- SECTION 2: NEARBY AREA LINKS (SPATIAL ADJACENCY) -->
+<section class="panel" style="margin-bottom: 28px;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">Nearby Area Links (Adjacency Matrix)</h2>
+      <p class="muted" style="font-size: 0.85rem;">Defines proximity connections between Burewala areas. The matching engine uses this to match tutors from adjacent areas if no exact local tutor is available.</p>
+    </div>
+    <span class="badge badge-info">{{ links|length }} Active Links</span>
+  </div>
+
+  <!-- Form to add adjacency -->
+  <form method="post" action="{{ url_for('superadmin.catalog_settings' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.catalog_settings') }}" class="form-grid" style="background: #f8fafc; padding: 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 20px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="adjacency">
+
+    <label>
+      Primary Area
+      <select name="area_id" required>
+        <option value="">Select Primary Area...</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}">{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Nearby / Adjacent Area
+      <select name="nearby_area_id" required>
+        <option value="">Select Adjacent Area...</option>
+        {% for a in areas %}
+        <option value="{{ a.id }}">{{ a.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Proximity Priority
+      <select name="priority">
+        <option value="1">Priority 1 (Direct Neighbor / High)</option>
+        <option value="2">Priority 2 (Nearby Zone / Medium)</option>
+        <option value="3">Priority 3 (Extended Vicinity)</option>
+      </select>
+    </label>
+
+    <div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; height: 42px;">
+        Connect Areas
+      </button>
+    </div>
+  </form>
+
+  <!-- Clean Data Table for Adjacency Links -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 28%;">Primary Area</th>
+          <th style="width: 8%; text-align: center;">Relation</th>
+          <th style="width: 28%;">Adjacent Area</th>
+          <th style="width: 22%;">Matching Priority</th>
+          <th style="width: 14%; text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for link in links %}
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></span>
+              <strong style="color: var(--text);">{{ link.area.name }}</strong>
+            </div>
+          </td>
+          <td style="text-align: center; color: var(--muted); font-size: 1.15rem; font-weight: 700;">
+            ↔
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6366f1;"></span>
+              <strong style="color: var(--text);">{{ link.nearby_area.name }}</strong>
+            </div>
+          </td>
+          <td>
+            {% if link.priority == 1 %}
+              <span class="badge badge-success">Priority 1 (Direct Adjacent)</span>
+            {% elif link.priority == 2 %}
+              <span class="badge badge-info">Priority 2 (Nearby Zone)</span>
+            {% else %}
+              <span class="badge badge-gray">Priority {{ link.priority }}</span>
+            {% endif %}
+          </td>
+          <td style="text-align: right;">
+            <form method="post" action="{{ url_for('superadmin.delete_adjacency' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.delete_adjacency', link_id=link.id) }}" style="display: inline-block; margin: 0;" onsubmit="return confirm('Remove link between {{ link.area.name }} and {{ link.nearby_area.name }}?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger" style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; font-size: 0.8rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Remove
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="empty">
+            <div style="padding: 24px; text-align: center; color: var(--muted);">
+              No nearby area links configured yet. Use the form above to connect adjacent areas.
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 3: EXISTING BUSINESS OPTIONS -->
+<section class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">Existing Catalog Options</h2>
+      <p class="muted" style="font-size: 0.85rem;">Edit names or enable/disable options. Disabled options remain preserved for past records.</p>
+    </div>
+    
+    <!-- Filter Pills -->
+    <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="catalog-filter-tabs">
+      <button type="button" class="btn btn-sm btn-primary filter-tab active" data-filter="all">All ({{ items|length }})</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="qualification">🎓 Degrees</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="timing">⏰ Timings</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="area">📍 Areas</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="subject">📚 Subjects</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="class">🏫 Classes</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="mode">💻 Modes</button>
+      <button type="button" class="btn btn-sm btn-secondary filter-tab" data-filter="city">🏙️ Cities</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="catalog-table">
+      <thead>
+        <tr>
+          <th style="width: 14%;">Type</th>
+          <th style="width: 32%;">Name / Title</th>
+          <th style="width: 22%;">Parent Location</th>
+          <th style="width: 18%;">Status</th>
+          <th style="width: 14%; text-align: right;">Save</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr data-kind="{{ item.kind }}">
+          <td>
+            <form id="form-item-{{ item.id }}" method="post" action="{{ url_for('superadmin.catalog_settings' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.catalog_settings') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="update">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+            </form>
+            <span class="badge {% if item.kind == 'area' %}badge-info{% elif item.kind == 'subject' %}badge-success{% elif item.kind == 'class' %}badge-warning{% elif item.kind == 'city' %}badge-primary{% elif item.kind == 'qualification' %}badge-primary{% elif item.kind == 'timing' %}badge-info{% else %}badge-gray{% endif %}">
+              {{ item.kind|upper }}
+            </span>
+          </td>
+          <td>
+            <input name="name" value="{{ item.name }}" form="form-item-{{ item.id }}" required style="padding: 7px 10px; font-size: 0.88rem; width: 100%;">
+          </td>
+          <td style="color: var(--muted); font-size: 0.88rem;">
+            {{ item.parent.name if item.parent else '—' }}
+          </td>
+          <td>
+            <select name="active" form="form-item-{{ item.id }}" style="padding: 7px 10px; font-size: 0.85rem; width: 100%;">
+              <option value="1" {{ 'selected' if item.active else '' }}>Active</option>
+              <option value="0" {{ 'selected' if not item.active else '' }}>Disabled</option>
+            </select>
+          </td>
+          <td style="text-align: right;">
+            <button type="submit" form="form-item-{{ item.id }}" class="btn btn-sm btn-primary">
+              Save
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Filter Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tabs = document.querySelectorAll('.filter-tab');
+  const rows = document.querySelectorAll('#catalog-table tbody tr');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      tabs.forEach(t => {
+        t.classList.remove('btn-primary', 'active');
+        t.classList.add('btn-secondary');
+      });
+      this.classList.remove('btn-secondary');
+      this.classList.add('btn-primary', 'active');
+
+      const filter = this.getAttribute('data-filter');
+      rows.forEach(row => {
+        if (filter === 'all' || row.getAttribute('data-kind') === filter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+{% endblock %}

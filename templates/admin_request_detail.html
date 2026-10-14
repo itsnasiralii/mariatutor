@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+{% block title %}Case {{ req.public_ref }} — Admin Pipeline{% endblock %}
+{% block page_title %}Lead Case {{ req.public_ref }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">CASE {{ req.public_ref }}</p>
+    <h1>{{ req.subject.name }} · {{ req.school_class.name }}</h1>
+    <span class="badge badge-info">{{ req.status }}</span>
+    {% if req.commission_snapshot_type %}
+      <span class="badge badge-primary">Locked Commission: {{ req.commission_snapshot_value }}{% if req.commission_snapshot_type == 'percent' %}%{% else %} PKR{% endif %}</span>
+    {% endif %}
+  </div>
+  <div style="display: flex; gap: 8px;">
+    {% if has_permission(current_user, 'edit_requests') %}
+    <a class="btn btn-primary" href="{{ url_for('admin.edit_request', request_id=req.id) }}">
+      ✏️ Edit Request Details
+    </a>
+    {% endif %}
+    <a class="btn btn-secondary" href="{{ url_for('admin.requests_list') }}">← Back to Requests</a>
+  </div>
+</div>
+
+<div class="cards two">
+  <article class="card" style="border-radius: 14px; border: 1.5px solid #e2e8f0; background: #ffffff; box-shadow: 0 4px 18px rgba(0,0,0,0.03); overflow: hidden; padding: 0;">
+    <!-- Top Accent Header Bar -->
+    <div style="height: 4px; background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);"></div>
+    
+    <div style="padding: 22px 24px;">
+      <!-- Title + Quick Edit -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+            🛡️
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Private Lead Details</h2>
+            <small style="color: #64748b; font-size: 0.8rem;">Confidential student requirements protected by platform firewall</small>
+          </div>
+        </div>
+        {% if has_permission(current_user, 'edit_requests') %}
+        <a href="{{ url_for('admin.edit_request', request_id=req.id) }}" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem; gap: 4px;">
+          ✏️ Edit Details
+        </a>
+        {% endif %}
+      </div>
+
+      <!-- Parent Client Profile Box -->
+      <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); flex-shrink: 0;">
+            👤
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span style="font-size: 1.05rem; font-weight: 800; color: #0f172a;">
+                {{ req.parent.parent.full_name if req.parent and req.parent.parent else 'Parent Client' }}
+              </span>
+              <span style="background: #e0e7ff; color: #4338ca; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">
+                Parent Client
+              </span>
+            </div>
+            
+            {% if can_contacts %}
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 0.85rem;">
+              <a href="tel:{{ req.parent.phone }}" style="color: #047857; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; padding: 2px 8px; border-radius: 6px; border: 1px solid #a7f3d0;">
+                📞 {{ req.parent.phone }}
+              </a>
+              {% if req.parent.email %}
+              <a href="mailto:{{ req.parent.email }}" style="color: #1d4ed8; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; padding: 2px 8px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                ✉️ {{ req.parent.email }}
+              </a>
+              {% endif %}
+            </div>
+            {% else %}
+            <span style="color: #94a3b8; font-size: 0.82rem; font-style: italic; display: block; margin-top: 4px;">Contact numbers restricted by permission</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Details Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        
+        <!-- Location -->
+        <div style="background: #ffffff; border: 1.5px solid #edf2f7; border-radius: 10px; padding: 12px 14px;">
+          <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+            <span>📍</span> Area &amp; Sector
+          </div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">
+            {{ req.area.name }}, Burewala
+          </div>
+          {% if req.subarea_text %}
+          <div style="font-size: 0.82rem; color: #475569; margin-top: 2px;">
+            🏡 {{ req.subarea_text }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Mode -->
+        <div style="background: #ffffff; border: 1.5px solid #edf2f7; border-radius: 10px; padding: 12px 14px;">
+          <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+            <span>🏠</span> Teaching Mode
+          </div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: #0f172a;">
+            {{ req.mode.name }}
+          </div>
+          <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">
+            In-person home tuition
+          </div>
+        </div>
+
+        <!-- Timing -->
+        <div style="background: #ffffff; border: 1.5px solid #edf2f7; border-radius: 10px; padding: 12px 14px;">
+          <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+            <span>⏰</span> Preferred Timing
+          </div>
+          <div style="font-weight: 700; font-size: 0.88rem; color: #b45309; display: inline-flex; align-items: center; gap: 4px; background: #fffbeb; padding: 2px 8px; border-radius: 6px; border: 1px solid #fde68a;">
+            🕒 {{ req.preferred_time }}
+          </div>
+        </div>
+
+        <!-- Gender Preference -->
+        <div style="background: #ffffff; border: 1.5px solid #edf2f7; border-radius: 10px; padding: 12px 14px;">
+          <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+            <span>👤</span> Gender Preference
+          </div>
+          <div>
+            {% if req.tutor_gender_preference == 'Female' %}
+            <span style="background: #fdf2f8; color: #be185d; font-weight: 700; font-size: 0.85rem; padding: 2px 8px; border-radius: 6px; border: 1px solid #fbcfe8; display: inline-flex; align-items: center; gap: 4px;">
+              🌸 Female Tutor Only
+            </span>
+            {% elif req.tutor_gender_preference == 'Male' %}
+            <span style="background: #f0fdf4; color: #15803d; font-weight: 700; font-size: 0.85rem; padding: 2px 8px; border-radius: 6px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px;">
+              🌿 Male Tutor Only
+            </span>
+            {% else %}
+            <span style="background: #f8fafc; color: #334155; font-weight: 600; font-size: 0.85rem; padding: 2px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+              Any Gender Accepted
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Monthly Budget -->
+        <div style="background: #ffffff; border: 1.5px solid #edf2f7; border-radius: 10px; padding: 12px 14px; grid-column: 1 / -1;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; display: flex; align-items: center; gap: 5px;">
+                <span>💵</span> Monthly Tuition Budget
+              </div>
+              <div style="font-weight: 800; font-size: 1.15rem; color: #065f46;">
+                PKR {{ req.budget_min or '7000' }}{% if req.budget_max %} – {{ req.budget_max }}{% endif %} <span style="font-size: 0.85rem; font-weight: 600; color: #047857;">/ month</span>
+              </div>
+            </div>
+            <span style="background: #ecfdf5; color: #047857; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid #a7f3d0;">
+              Standard Market Rate
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Special Requirements Note Box -->
+      <div style="background: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+        <div style="font-size: 0.74rem; font-weight: 700; color: #7e22ce; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+          <span>📝</span> Special Learning Requirements
+        </div>
+        <div style="font-size: 0.9rem; color: #3b0764; font-style: {% if req.requirements and req.requirements != '—' %}normal{% else %}italic{% endif %}; line-height: 1.5;">
+          {{ req.requirements if req.requirements and req.requirements != '—' else 'No special syllabus notes provided by parent (standard board examination preparation).' }}
+        </div>
+      </div>
+
+      <!-- Shortlisted Tutor Showcase (if present) -->
+      {% if req.selected_tutor %}
+      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(16,185,129,0.08);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 8px; background: #16a34a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+              🎓
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-weight: 800; font-size: 0.98rem; color: #166534;">
+                  Shortlisted Educator: {{ req.selected_tutor.full_name }}
+                </span>
+                <span style="background: #16a34a; color: #ffffff; font-size: 0.72rem; font-weight: 700; padding: 1px 7px; border-radius: 4px;">
+                  {{ req.selected_tutor.tutor_code }}
+                </span>
+              </div>
+              {% if can_contacts %}
+              <div style="display: flex; gap: 8px; margin-top: 3px; font-size: 0.82rem;">
+                <a href="tel:{{ req.selected_tutor.user.phone }}" style="color: #15803d; font-weight: 600; text-decoration: none;">
+                  📞 {{ req.selected_tutor.user.phone }}
+                </a>
+                {% if req.selected_tutor.user.email %}
+                <span style="color: #15803d;">· {{ req.selected_tutor.user.email }}</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <a href="{{ url_for('admin.tutor_detail', tutor_id=req.selected_tutor.id) }}" class="btn btn-sm btn-outline" style="font-size: 0.78rem; background: #ffffff; border-color: #86efac; color: #166534;">
+            View Educator Dossier →
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </article>
+
+  <article class="card">
+    <h2>Case Actions</h2>
+    {% if has_permission(current_user,'edit_requests') %}
+      <form method="post" action="{{ url_for('admin.change_status',request_id=req.id) }}" style="margin-bottom: 14px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Workflow Status
+          <select name="status">
+            {% for s in statuses %}
+              <option {% if req.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Reason / Context
+          <input name="reason" maxlength="300" placeholder="Status update note">
+        </label>
+        <button class="btn btn-secondary" type="submit">Update Status</button>
+      </form>
+    {% endif %}
+    {% if can_match %}
+      <form class="inline-form" method="post" action="{{ url_for('admin.match_request',request_id=req.id) }}" style="margin-bottom: 14px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">🔍 Generate / Refresh Spatial Matches</button>
+      </form>
+    {% endif %}
+    {% if has_permission(current_user,'edit_requests') %}
+      <form method="post" action="{{ url_for('admin.add_internal_note',request_id=req.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Private Internal Note
+          <textarea name="note" maxlength="500" rows="2" placeholder="Only platform staff can see this"></textarea>
+        </label>
+        <button class="btn btn-secondary" type="submit">Add Internal Note</button>
+      </form>
+    {% endif %}
+  </article>
+</div>
+
+<section class="section">
+  <h2>Opportunity Exposure &amp; Tutor Interest</h2>
+  <p class="muted" style="margin-bottom: 12px;">Tutors see only the general Burewala area and request attributes. This table tracks who received the anonymized lead and who expressed interest.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tutor</th>
+          <th>Verification</th>
+          <th>Shown</th>
+          <th>Viewed</th>
+          <th>Interest</th>
+          <th>Admin Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ex in exposures %}
+        <tr>
+          <td>
+            <strong>{{ ex.tutor.full_name }}</strong> · <code>{{ ex.tutor.tutor_code }}</code>
+            {% if can_contacts %}<br><small class="muted">{{ ex.tutor.user.phone }}</small>{% endif %}
+          </td>
+          <td><span class="badge badge-success">{{ ex.tutor.verification_status }}</span></td>
+          <td>{{ ex.shown_at.strftime('%d %b %Y %I:%M %p') }}</td>
+          <td>{{ ex.viewed_at.strftime('%d %b %I:%M %p') if ex.viewed_at else 'Not viewed' }}</td>
+          <td>
+            {% if ex.interested_at %}
+              <span class="badge badge-info">Yes · {{ ex.interested_at.strftime('%d %b %I:%M %p') }}</span>
+              {% if ex.interest_note %}<br><small class="muted">"{{ ex.interest_note }}"</small>{% endif %}
+            {% else %}
+              No
+            {% endif %}
+          </td>
+          <td>
+            {% if can_match and ex.interested_at %}
+              <form method="post" action="{{ url_for('admin.select_tutor',request_id=req.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="tutor_id" value="{{ ex.tutor_id }}">
+                <button class="btn btn-sm btn-primary" type="submit">Shortlist Tutor</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No tutor opportunities generated yet. Click "Generate / Refresh Spatial Matches" above.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% if has_permission(current_user,'release_contacts') and req.selected_tutor %}
+<section class="section panel" style="border-left: 4px solid var(--success);">
+  <h2>Authorized Contact Release (Zero-Leakage Gate)</h2>
+  {% if req.contact_released_at %}
+    <p class="notice privacy">✓ Contact details released on {{ req.contact_released_at.strftime('%d %b %Y %I:%M %p') }}.</p>
+  {% else %}
+    <p style="margin-bottom: 12px;">Release parent and shortlisted tutor contact information only after both parties confirm the demo/introduction.</p>
+    <form method="post" action="{{ url_for('admin.release_contacts',request_id=req.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-success" type="submit">🔓 Authorize Introduction &amp; Release Contacts</button>
+    </form>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if has_permission(current_user,'record_payments') %}
+<section class="section">
+  <h2>Financial Ledger &amp; Commission Collection</h2>
+  <div class="form-shell wide" style="margin-bottom: 20px;">
+    <form method="post" action="{{ url_for('admin.record_payment',request_id=req.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-grid">
+        <label>Gross Monthly Tuition Received (PKR)
+          <input type="number" min="1" name="amount_pkr" required placeholder="e.g. 15000">
+        </label>
+        <label>Payment Channel
+          <select name="method">
+            <option value="JazzCash">JazzCash</option>
+            <option value="Easypaisa">Easypaisa</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </label>
+        <label>Transaction Reference
+          <input name="reference" maxlength="120" placeholder="TID / Receipt #">
+        </label>
+        <label>Notes
+          <input name="notes" maxlength="500" placeholder="First month tuition settlement">
+        </label>
+      </div>
+      <button class="btn btn-primary" type="submit" style="margin-top: 14px;">Record Payment &amp; Calculate Commission</button>
+    </form>
+  </div>
+
+  {% if payments is defined and payments %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Channel</th>
+          <th>Gross PKR</th>
+          <th>Platform Commission</th>
+          <th>Tutor Payout</th>
+          <th>Reference</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td>{{ p.created_at.strftime('%d %b %Y') }}</td>
+          <td><span class="badge badge-info">{{ p.method }}</span></td>
+          <td><strong>PKR {{ p.amount_pkr }}</strong></td>
+          <td>PKR {{ p.platform_commission_pkr }}</td>
+          <td>PKR {{ p.tutor_amount_pkr }}</td>
+          <td><code>{{ p.reference or '—' }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="section">
+  <h2>Internal Activity Timeline</h2>
+  <div class="timeline">
+    {% for e in events %}
+      <article>
+        <time>{{ e.created_at.strftime('%d %b %Y %I:%M %p') }} {% if e.private %}<span class="badge badge-warning">Private Staff Note</span>{% endif %}</time>
+        <b>{{ e.event_type }}</b>
+        <p>{{ e.details }}</p>
+      </article>
+    {% else %}
+      <p class="muted">No events recorded.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

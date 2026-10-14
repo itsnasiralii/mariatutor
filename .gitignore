@@ -1,0 +1,39 @@
+# Environments and local secrets
+.env
+.env.*
+!.env.example
+.venv/
+env/
+venv/
+ENV/
+
+# Python cache & build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and runtime instance state
+instance/*.db
+instance/*.sqlite
+instance/*.key
+instance/private_documents/
+*.db
+*.sqlite
+*.log
+
+# Nested local backup folders
+Burewala_Tutor_Marketplace_MVP/
+
+# Large local zip archives & temp test artifacts
+*.zip
+test_verify_fixes.py
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

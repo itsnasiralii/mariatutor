@@ -1,0 +1,843 @@
+{% extends 'base.html' %}
+{% block title %}Update Teaching Profile — Maria Tutor Burewala{% endblock %}
+
+{% block content %}
+<style>
+  .profile-shell {
+    max-width: 940px;
+    margin: 0 auto;
+    padding-bottom: 50px;
+  }
+  .profile-banner {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    border-radius: 16px;
+    padding: 30px 28px;
+    color: #fff;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .profile-banner h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .profile-banner p {
+    color: #c7d2fe;
+    font-size: 0.92rem;
+    margin: 0;
+    max-width: 600px;
+  }
+  .status-pill {
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-approved { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .status-pending  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+
+  .pcard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 26px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+  .pcard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .pcard-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .pcard-title .icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+  .pgrid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .pfield {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .pfield label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pfield input, .pfield select, .pfield textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+  .pfield input:focus, .pfield select:focus, .pfield textarea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    outline: none;
+  }
+  .pfield small {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  /* ══ SEXY INTERACTIVE EXPERIENCE BUILDER ══ */
+  .exp-builder-box {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+  }
+  .exp-builder-box:focus-within {
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  }
+  .exp-tiers {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .exp-tier-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #fff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .exp-tier-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #ede9fe;
+  }
+  .exp-tier-btn.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  }
+  .exp-snippets-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .exp-snippets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .exp-chip {
+    padding: 4px 10px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .exp-chip:hover {
+    background: #ede9fe;
+    border-color: #818cf8;
+    color: #3730a3;
+    transform: translateY(-1px);
+  }
+  .exp-textarea-wrap {
+    position: relative;
+  }
+  .exp-textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.2s ease;
+  }
+  .exp-textarea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    outline: none;
+  }
+  .exp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  /* ══ INTERACTIVE CHIPS GRID ══ */
+  .interactive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .choice-chip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .choice-chip:hover {
+    border-color: #818cf8;
+    background: #f5f3ff;
+  }
+  .choice-chip input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .choice-chip .custom-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid #94a3b8;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: transparent;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+  }
+  .choice-chip.active {
+    background: #ede9fe;
+    border-color: #6366f1;
+    color: #3730a3;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
+  }
+  .choice-chip.active .custom-indicator {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .pgrid-2 { grid-template-columns: 1fr; gap: 16px; }
+    .interactive-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .interactive-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="profile-shell">
+
+  <!-- Banner -->
+  <div class="profile-banner">
+    <div>
+      <div style="font-size:0.78rem; font-weight:700; color:#a5b4fc; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:4px;">
+        🎓 TUTOR PROFILE &amp; PREFERENCES
+      </div>
+      <h1>Update Your Teaching Profile</h1>
+      <p>
+        Edit your degrees, interactive teaching experience summary, hourly/monthly fees, and Burewala teaching sectors.
+      </p>
+    </div>
+    <div>
+      {% if tutor.verification_status == 'Approved' %}
+        <span class="status-pill status-approved">✓ Verified Faculty (Approved)</span>
+      {% else %}
+        <span class="status-pill status-pending">⏳ Verification: {{ tutor.verification_status }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post" id="profile-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Hidden final input that holds qualification for backend submission -->
+    <input type="hidden" id="final-qualification" name="qualification" value="{{ tutor.qualification or '' }}">
+
+    <!-- CARD 1: Basic Information & Degrees -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle">👤</div>
+          <div>
+            <div>1. Personal Credentials &amp; Qualification</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Select your certified Pakistani degree from the official education catalog.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pgrid-2" style="margin-bottom: 20px;">
+        <div class="pfield">
+          <label for="full_name">Full Name *</label>
+          <input id="full_name" name="full_name" value="{{ tutor.full_name }}" required maxlength="120" placeholder="e.g. Sir Usman Ali">
+          <small>As displayed on authorized shortlist introductions.</small>
+        </div>
+
+        <div class="pfield">
+          <label for="gender">Gender *</label>
+          <select id="gender" name="gender">
+            {% for g in ['Prefer not to say', 'Male', 'Female', 'Other'] %}
+              <option value="{{ g }}" {% if tutor.gender == g %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+          </select>
+          <small>Used for parent tutor gender preferences.</small>
+        </div>
+      </div>
+
+      <!-- Qualification Dropdown dynamically loaded from Database Catalog -->
+      <div class="pfield" style="margin-bottom: 12px;">
+        <label for="qualification-select">
+          <span>Highest Academic Qualification Degree *</span>
+          <span style="font-size:0.75rem; color:#6366f1; font-weight:600;">Pakistani Degrees (Admin Managed)</span>
+        </label>
+        <select id="qualification-select" onchange="handleQualificationChange()">
+          <option value="">-- Choose Your Degree --</option>
+          {% for item in choices['qualification'] %}
+            <option value="{{ item.name }}">{{ item.name }}</option>
+          {% endfor %}
+          <option value="__other__" style="font-weight:700; color:#4f46e5;">✨ Other (Specify custom / unlisted degree)</option>
+        </select>
+      </div>
+
+      <!-- Smooth "Other" Custom Degree Input Container -->
+      <div id="other-degree-container" style="display:none; padding:14px; background:#f5f3ff; border:1.5px dashed #a5b4fc; border-radius:10px; margin-bottom:12px;">
+        <label for="custom-degree-input" style="color:#3730a3; font-weight:700; font-size:0.85rem; margin-bottom:4px;">
+          Type Your Specific Degree / Major / University:
+        </label>
+        <input id="custom-degree-input" name="qualification_custom" maxlength="150" placeholder="e.g. M.Sc Physics (Govt College Burewala) or BS Data Science"
+               oninput="syncCustomQualification()"
+               style="background:#fff; border-color:#818cf8;">
+        <small style="color:#6366f1;">This exact custom degree title will be stored on your verified tutor profile.</small>
+      </div>
+    </div>
+
+    <!-- CARD 2: SEXY INTERACTIVE EXPERIENCE BUILDER -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle" style="background:#dbeafe; color:#2563eb;">⭐</div>
+          <div>
+            <div>2. Interactive Teaching Experience Builder</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Select your experience tier or click tags to instantly build your professional bio.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-builder-box">
+        <!-- Tier Selector -->
+        <div class="exp-snippets-label">1. Quick Experience Tier</div>
+        <div class="exp-tiers">
+          <div class="exp-tier-btn" onclick="selectExpTier('0-1 Year (Fresh / Passionate Tutor)', this)">
+            🌟 0–1 Year (Starter)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('1-3 Years (Experienced Home Tutor)', this)">
+            ⭐ 1–3 Years (Home Tutor)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('3-5 Years (Senior Academy & Home Specialist)', this)">
+            🏆 3–5 Years (Senior Specialist)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('5+ Years (Master Faculty / College Lecturer)', this)">
+            👑 5+ Years (Master Faculty)
+          </div>
+        </div>
+
+        <!-- Quick Highlight Tags -->
+        <div class="exp-snippets-label">2. Click to Insert Highlights</div>
+        <div class="exp-snippets">
+          <span class="exp-chip" onclick="appendExpSnippet('🏫 Taught at Aspire / Punjab College Burewala.')">+ 🏫 College / Academy Faculty</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🎯 Guided 25+ Matric & FSc students to 90%+ board marks.')">+ 🎯 90%+ Board Exam Results</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🔬 Conceptual science & numerical physics specialist.')">+ 🔬 Conceptual Sciences</span>
+          <span class="exp-chip" onclick="appendExpSnippet('📐 Step-by-step mathematics theorem and problem solver.')">+ 📐 Math Problem Solver</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🏠 4+ years providing personalized home tuitions in Satellite Town and Model Town.')">+ 🏠 Burewala Home Tuitions</span>
+          <span class="exp-chip" onclick="appendExpSnippet('💻 Interactive online classes with digital pen tablet.')">+ 💻 Digital Whiteboard</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🇬🇧 Experienced in Cambridge O/A Levels past paper solving.')">+ 🇬🇧 O/A Levels Cambridge</span>
+        </div>
+
+        <!-- Textarea -->
+        <div class="exp-textarea-wrap">
+          <textarea id="experience-area" name="experience" class="exp-textarea" maxlength="500" placeholder="Write or build your teaching bio... (e.g. 5 years teaching FSc Physics at Aspire College Burewala. Guided students to achieve A+ grades in Sahiwal/Multan Board exams.)" oninput="updateCharCount()">{{ tutor.experience or '' }}</textarea>
+        </div>
+
+        <div class="exp-footer">
+          <span id="exp-tip">💡 Tip: Parents love reading specific achievements and past schools taught in Burewala.</span>
+          <span id="char-count" style="font-weight:700; color:#4f46e5;">0 / 500 chars</span>
+        </div>
+      </div>
+
+      <!-- Daily Availability & Timings with Dynamic Database Catalog & 'Other' Option -->
+      <div class="pgrid-2" style="margin-top: 20px;">
+        <div class="pfield">
+          <label for="timing-select">
+            <span>Daily Availability &amp; Timings *</span>
+            <span style="font-size:0.75rem; color:#6366f1; font-weight:600;">Timing Slots (Admin Managed)</span>
+          </label>
+          <select id="timing-select" onchange="handleTimingChange()">
+            <option value="">-- Select Daily Availability --</option>
+            {% for item in choices['timing'] %}
+              <option value="{{ item.name }}">{{ item.name }}</option>
+            {% endfor %}
+            <option value="__other__" style="font-weight:700; color:#4f46e5;">✨ Other (Specify custom timing)</option>
+          </select>
+
+          <!-- Hidden final input that holds availability for backend submission -->
+          <input type="hidden" id="final-availability" name="availability" value="{{ tutor.availability or '' }}">
+
+          <!-- Smooth "Other" Custom Timing Input Container -->
+          <div id="other-timing-container" style="display:none; padding:12px; background:#f0fdf4; border:1.5px dashed #86efac; border-radius:8px; margin-top:8px;">
+            <label for="custom-timing-input" style="color:#15803d; font-weight:700; font-size:0.82rem; margin-bottom:4px;">
+              Type Your Custom Schedule &amp; Timings:
+            </label>
+            <input id="custom-timing-input" name="availability_custom" maxlength="200" placeholder="e.g. Daily 6:30 PM - 8:30 PM or Alternate Days"
+                   oninput="syncCustomTiming()"
+                   style="background:#fff; border-color:#86efac;">
+            <small style="color:#15803d;">Your custom timing will be visible to parents on shortlisted matches.</small>
+          </div>
+
+          <!-- Quick Fill Shortcut Pills -->
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+            {% for item in choices['timing'] %}
+              <span class="exp-chip" onclick="quickSelectTiming('{{ item.name|replace("'", "\\'") }}')">+ {{ item.name.split('(')[-1].replace(')', '') if '(' in item.name else item.name[:18] }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="pgrid-2" style="gap:10px;">
+          <div class="pfield">
+            <label for="expected_fee_min">Min Fee (PKR)</label>
+            <div style="position:relative;">
+              <span style="position:absolute; left:10px; top:11px; font-weight:700; color:#64748b; font-size:0.82rem;">Rs.</span>
+              <input id="expected_fee_min" type="number" name="expected_fee_min" min="0" step="500" value="{{ tutor.expected_fee_min or '' }}" placeholder="8,000" style="padding-left:36px;">
+            </div>
+          </div>
+          <div class="pfield">
+            <label for="expected_fee_max">Max Fee (PKR)</label>
+            <div style="position:relative;">
+              <span style="position:absolute; left:10px; top:11px; font-weight:700; color:#64748b; font-size:0.82rem;">Rs.</span>
+              <input id="expected_fee_max" type="number" name="expected_fee_max" min="0" step="500" value="{{ tutor.expected_fee_max or '' }}" placeholder="18,000" style="padding-left:36px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3: Burewala Teaching Locations -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle" style="background:#ffedd5; color:#ea580c;">📍</div>
+          <div>
+            <div>3. Burewala Teaching Locations</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Areas where you are open to accepting home tuition assignments.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('area')">
+          Toggle All Areas
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-area">
+        {% for item in choices['area'] %}
+        <label class="choice-chip {% if item in tutor.catalog %}active{% endif %}" data-kind="area" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}" {% if item in tutor.catalog %}checked{% endif %}>
+          <div class="custom-indicator">✓</div>
+          <span>📍 {{ item.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CARD 4: Academic Subjects -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle" style="background:#dcfce7; color:#16a34a;">📚</div>
+          <div>
+            <div>4. Academic Subjects You Teach</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Select all subjects for which you want to receive matched tuition leads.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('subject')">
+          Toggle All Subjects
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-subject">
+        {% for item in choices['subject'] %}
+        <label class="choice-chip {% if item in tutor.catalog %}active{% endif %}" data-kind="subject" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}" {% if item in tutor.catalog %}checked{% endif %}>
+          <div class="custom-indicator">✓</div>
+          <span>📖 {{ item.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CARD 5: Target Classes -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle" style="background:#fef3c7; color:#d97706;">🏫</div>
+          <div>
+            <div>5. School &amp; College Classes</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Grade levels you are comfortable tutoring.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('class')">
+          Toggle All Classes
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-class">
+        {% for item in choices['class'] %}
+        <label class="choice-chip {% if item in tutor.catalog %}active{% endif %}" data-kind="class" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}" {% if item in tutor.catalog %}checked{% endif %}>
+          <div class="custom-indicator">✓</div>
+          <span>🎒 {{ item.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CARD 6: Teaching Modes -->
+    <div class="pcard">
+      <div class="pcard-head">
+        <div class="pcard-title">
+          <div class="icon-circle" style="background:#fee2e2; color:#dc2626;">🚗</div>
+          <div>
+            <div>6. Teaching Mode Preference</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Home tuition at student's home, your premises, or online.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-grid" id="grid-mode">
+        {% for item in choices['mode'] %}
+        <label class="choice-chip {% if item in tutor.catalog %}active{% endif %}" data-kind="mode" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}" {% if item in tutor.catalog %}checked{% endif %}>
+          <div class="custom-indicator">✓</div>
+          <span>🌐 {{ item.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Submit Bar -->
+    <div style="background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:22px 28px; box-shadow:0 4px 12px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+      <div style="font-size:0.85rem; color:#64748b; max-width:480px;">
+        💡 <strong>Note:</strong> Profile changes set your verification status back to <em>Under Review</em> until an administrator approves your updated subjects and fee ranges.
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding:12px 28px; font-size:1rem; font-weight:700; box-shadow:0 4px 12px rgba(79, 70, 229, 0.35);">
+        💾 Save Profile &amp; Submit for Review →
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+// ══ QUALIFICATION & TIMING DROPDOWN LOGIC WITH OTHER OPTION ══
+const existingQual = {{ (tutor.qualification or '')|tojson }};
+const existingAvail = {{ (tutor.availability or '')|tojson }};
+
+function initQualification() {
+  const select = document.getElementById('qualification-select');
+  const otherContainer = document.getElementById('other-degree-container');
+  const customInput = document.getElementById('custom-degree-input');
+  const finalInput = document.getElementById('final-qualification');
+
+  if (!existingQual || existingQual.trim() === '') {
+    return;
+  }
+
+  // Check if existingQual matches an option in select
+  let matched = false;
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value.toLowerCase() === existingQual.toLowerCase()) {
+      select.selectedIndex = i;
+      matched = true;
+      break;
+    }
+  }
+
+  if (!matched) {
+    // Select "Other" and fill customInput
+    select.value = '__other__';
+    otherContainer.style.display = 'block';
+    customInput.value = existingQual;
+  }
+}
+
+function handleQualificationChange() {
+  const select = document.getElementById('qualification-select');
+  const otherContainer = document.getElementById('other-degree-container');
+  const customInput = document.getElementById('custom-degree-input');
+  const finalInput = document.getElementById('final-qualification');
+
+  if (select.value === '__other__') {
+    otherContainer.style.display = 'block';
+    customInput.focus();
+    finalInput.value = customInput.value.trim();
+  } else {
+    otherContainer.style.display = 'none';
+    finalInput.value = select.value;
+  }
+}
+
+function syncCustomQualification() {
+  const customInput = document.getElementById('custom-degree-input');
+  const finalInput = document.getElementById('final-qualification');
+  finalInput.value = customInput.value.trim();
+}
+
+function initTiming() {
+  const select = document.getElementById('timing-select');
+  const otherContainer = document.getElementById('other-timing-container');
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+
+  if (!existingAvail || existingAvail.trim() === '') {
+    return;
+  }
+
+  let matched = false;
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value.toLowerCase() === existingAvail.toLowerCase()) {
+      select.selectedIndex = i;
+      matched = true;
+      break;
+    }
+  }
+
+  if (!matched) {
+    select.value = '__other__';
+    otherContainer.style.display = 'block';
+    customInput.value = existingAvail;
+  }
+}
+
+function handleTimingChange() {
+  const select = document.getElementById('timing-select');
+  const otherContainer = document.getElementById('other-timing-container');
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+
+  if (select.value === '__other__') {
+    otherContainer.style.display = 'block';
+    customInput.focus();
+    finalInput.value = customInput.value.trim();
+  } else {
+    otherContainer.style.display = 'none';
+    finalInput.value = select.value;
+  }
+}
+
+function syncCustomTiming() {
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+  finalInput.value = customInput.value.trim();
+}
+
+function quickSelectTiming(timing) {
+  const select = document.getElementById('timing-select');
+  const otherContainer = document.getElementById('other-timing-container');
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+
+  let matched = false;
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value === timing) {
+      select.selectedIndex = i;
+      matched = true;
+      break;
+    }
+  }
+  if (matched) {
+    otherContainer.style.display = 'none';
+    finalInput.value = timing;
+  } else {
+    select.value = '__other__';
+    otherContainer.style.display = 'block';
+    customInput.value = timing;
+    finalInput.value = timing;
+  }
+}
+
+// Ensure final inputs are synced right before form submit
+document.getElementById('profile-form').addEventListener('submit', function() {
+  // Sync Qualification
+  const qualSelect = document.getElementById('qualification-select');
+  const qualCustom = document.getElementById('custom-degree-input');
+  const qualFinal = document.getElementById('final-qualification');
+  if (qualSelect.value === '__other__') {
+    qualFinal.value = qualCustom.value.trim() || 'Other';
+  } else {
+    qualFinal.value = qualSelect.value;
+  }
+
+  // Sync Availability
+  const availSelect = document.getElementById('timing-select');
+  const availCustom = document.getElementById('custom-timing-input');
+  const availFinal = document.getElementById('final-availability');
+  if (availSelect.value === '__other__') {
+    availFinal.value = availCustom.value.trim() || 'Flexible Timings';
+  } else {
+    availFinal.value = availSelect.value;
+  }
+});
+
+// ══ EXPERIENCE BUILDER LOGIC ══
+function selectExpTier(tierText, btnEl) {
+  document.querySelectorAll('.exp-tier-btn').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+
+  const area = document.getElementById('experience-area');
+  // If textarea already has content, prepend or replace tier info
+  const tierPrefix = "Experience: " + tierText + ". ";
+  if (!area.value.includes(tierText)) {
+    area.value = tierPrefix + area.value;
+  }
+  updateCharCount();
+  area.focus();
+}
+
+function appendExpSnippet(snippet) {
+  const area = document.getElementById('experience-area');
+  const cur = area.value.trim();
+  if (cur.length > 0) {
+    area.value = cur + " " + snippet;
+  } else {
+    area.value = snippet;
+  }
+  updateCharCount();
+  area.focus();
+}
+
+function updateCharCount() {
+  const area = document.getElementById('experience-area');
+  const counter = document.getElementById('char-count');
+  if (area && counter) {
+    const len = area.value.length;
+    counter.textContent = len + ' / 500 chars';
+    if (len > 480) {
+      counter.style.color = '#dc2626';
+    } else {
+      counter.style.color = '#4f46e5';
+    }
+  }
+}
+
+// ══ INTERACTIVE CHIPS LOGIC ══
+function handleChipClick(labelEl) {
+  setTimeout(() => {
+    const input = labelEl.querySelector('input[type="checkbox"]');
+    if (input) {
+      if (input.checked) {
+        labelEl.classList.add('active');
+      } else {
+        labelEl.classList.remove('active');
+      }
+    }
+  }, 10);
+}
+
+function toggleAllCategory(kind) {
+  const chips = document.querySelectorAll('.choice-chip[data-kind="' + kind + '"]');
+  const allChecked = Array.from(chips).every(c => c.querySelector('input').checked);
+  chips.forEach(c => {
+    const input = c.querySelector('input');
+    input.checked = !allChecked;
+    if (input.checked) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initQualification();
+  initTiming();
+  updateCharCount();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Admin &amp; Staff Login — Maria Tutor Burewala{% endblock %}
+
+{% block public_content %}
+<div class="auth-page" style="min-height: 85vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 100%);">
+  <div class="auth-card" style="max-width: 440px; width: 100%; border: 1.5px solid #334155; background: #1e293b; color: #f8fafc; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-radius: 16px; padding: 36px 30px;">
+
+    <!-- Admin Badge & Header -->
+    <div style="text-align: center; margin-bottom: 26px;">
+      <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(99, 102, 241, 0.2); border: 1.5px solid #6366f1; color: #818cf8; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 14px;">
+        🛡️
+      </div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Staff &amp; Admin Console</h1>
+      <p style="color: #94a3b8; font-size: 0.88rem; margin: 0; line-height: 1.4;">
+        Burewala Operations, Spatial Lead Matching, and Tutor Verification Portal.
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack" style="margin-bottom: 18px;">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}" style="border-radius: 8px;">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('auth.admin_login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group" style="margin-bottom: 18px;">
+        <label for="identifier" style="color: #cbd5e1; font-size: 0.86rem; font-weight: 600; display: block; margin-bottom: 6px;">
+          Staff / Admin Email Address
+        </label>
+        <input id="identifier" name="identifier" type="email" autocomplete="username" required
+               placeholder="admin@mariahome.com or staff@mariahome.com"
+               style="width: 100%; padding: 12px 14px; background: #0f172a; border: 1.5px solid #475569; border-radius: 8px; color: #fff; font-size: 0.92rem;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 22px;">
+        <label for="password" style="color: #cbd5e1; font-size: 0.86rem; font-weight: 600; display: block; margin-bottom: 6px;">
+          Password
+        </label>
+        <input id="password" type="password" name="password" autocomplete="current-password" required
+               placeholder="Enter your admin password"
+               style="width: 100%; padding: 12px 14px; background: #0f172a; border: 1.5px solid #475569; border-radius: 8px; color: #fff; font-size: 0.92rem;">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; font-weight: 700; background: #4f46e5; border-color: #4f46e5; border-radius: 8px;">
+        Log in to Admin Center →
+      </button>
+    </form>
+
+    <!-- 1-Click Instant Demo Login (For Admin Roles Only) -->
+    <div style="margin-top: 24px; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed #475569; border-radius: 10px;">
+      <div style="font-size: 0.76rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; justify-content: space-between;">
+        <span>⚡ 1-Click Staff Demo Access</span>
+        <span style="color: #64748b;">Local Dev</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <a href="{{ url_for('auth.quick_switch', role='super_admin') }}" class="btn btn-sm" style="justify-content: center; background: #312e81; color: #c7d2fe; border: 1px solid #4338ca; font-size: 0.8rem; text-decoration: none;">
+          👑 Super Admin
+        </a>
+        <a href="{{ url_for('auth.quick_switch', role='admin') }}" class="btn btn-sm" style="justify-content: center; background: #0c4a6e; color: #bae6fd; border: 1px solid #0284c7; font-size: 0.8rem; text-decoration: none;">
+          🛡️ Staff Admin
+        </a>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="{{ url_for('main.index') }}" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">
+        ← Back to Public Website
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

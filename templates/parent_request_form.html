@@ -1,0 +1,565 @@
+{% extends 'base.html' %}
+{% block title %}Request a Home Tutor — Burewala Marketplace{% endblock %}
+
+{% block content %}
+<div style="max-width: 980px; margin: 0 auto; padding: 10px 0 50px 0;">
+
+  <!-- Breadcrumbs & Header -->
+  <div style="margin-bottom: 24px;">
+    <div class="breadcrumb" style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
+      <a href="{{ url_for('main.parent_dashboard') }}" style="color: #6366f1; text-decoration: none; font-weight: 500;">Parent Dashboard</a> / 
+      <span style="color: #0f172a; font-weight: 600;">Request a New Tutor</span>
+    </div>
+    
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; color: #4338ca; font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 10px; border: 1px solid #c7d2fe;">
+          <span>🎯</span> Burewala Verified Tuition Network
+        </div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.02em; line-height: 1.2;">
+          Request a Qualified Home Tutor
+        </h1>
+        <p style="color: #64748b; font-size: 0.98rem; margin: 0; max-width: 680px; line-height: 1.55;">
+          Tell us your student's learning targets. Maria Tutor verifies background credentials, coordinates schedules across Burewala, and organizes a <strong>free trial demo class</strong>.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('main.parent_explore_tutors') }}" class="btn btn-secondary" style="font-size: 0.88rem; height: 42px; padding: 0 16px; gap: 8px; border-radius: 10px;">
+          <span>🔍</span> Browse Verified Tutors
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stepper Indicator -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px;">
+    <div style="background: #ffffff; border: 1.5px solid #4f46e5; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: #4f46e5; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
+        1
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.88rem; color: #0f172a;">Academic Needs</div>
+        <div style="font-size: 0.76rem; color: #64748b;">Class, Subject &amp; Mode</div>
+      </div>
+    </div>
+
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
+        2
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.88rem; color: #0f172a;">Location &amp; Time</div>
+        <div style="font-size: 0.76rem; color: #64748b;">Burewala Area &amp; Slot</div>
+      </div>
+    </div>
+
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; flex-shrink: 0;">
+        3
+      </div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.88rem; color: #0f172a;">Budget &amp; Trial</div>
+        <div style="font-size: 0.76rem; color: #64748b;">PKR / month &amp; Demo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preferred Tutor Banner (if directed from Explore Tutors) -->
+  {% if preferred_tutor %}
+  <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #86efac; border-radius: 14px; padding: 18px 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 18px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);">
+    <!-- Avatar Icon (Graduate Girl Pink Cap or Boy Green Cap) -->
+    <div style="width: 52px; height: 52px; border-radius: 12px; background: {% if preferred_tutor.gender == 'Female' %}#fdf2f8{% else %}#f0fdf4{% endif %}; border: 1.5px solid {% if preferred_tutor.gender == 'Female' %}#fbcfe8{% else %}#bbf7d0{% endif %}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 4px;">
+      {% if preferred_tutor.gender == 'Female' %}
+      <!-- Graduate Girl with PINK Cap -->
+      <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 28C17 38 18 47 22 51C25 45 25 36 25 31" fill="#78350f"/>
+        <path d="M45 28C47 38 46 47 42 51C39 45 39 36 39 31" fill="#78350f"/>
+        <path d="M17 54C17 45 24 41 32 41C40 41 47 45 47 54" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+        <path d="M29 41L32 46L35 41" stroke="#be185d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#d97706" stroke-width="1.2"/>
+        <circle cx="28.5" cy="31.5" r="1.2" fill="#0f172a"/>
+        <circle cx="35.5" cy="31.5" r="1.2" fill="#0f172a"/>
+        <path d="M29.5 35.5C30.5 37 33.5 37 34.5 35.5" stroke="#be185d" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M22 28C24 23 28 21 32 21C36 21 40 23 42 28C41 24 37 23 32 23C27 23 23 24 22 28Z" fill="#92400e"/>
+        <polygon points="32,9 56,18 32,27 8,18" fill="#ec4899" stroke="#be185d" stroke-width="2"/>
+        <polygon points="32,11 52,18 32,25 12,18" fill="#f472b6"/>
+        <rect x="23" y="23" width="18" height="5" rx="2" fill="#db2777"/>
+        <path d="M32 18L50 24V34" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="50" cy="35" r="2.2" fill="#ca8a04"/>
+        <circle cx="32" cy="18" r="2" fill="#ca8a04"/>
+      </svg>
+      {% else %}
+      <!-- Graduate Boy with GREEN Cap -->
+      <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 54C16 45 23 41 32 41C41 41 48 45 48 54" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <path d="M28 41L32 47L36 41" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#ca8a04" stroke-width="1.2"/>
+        <path d="M22 28C22 22 26 21 32 21C38 21 42 22 42 28C42 24 39 22 32 22C25 22 22 24 22 28Z" fill="#334155"/>
+        <circle cx="28.5" cy="31.5" r="1.2" fill="#0f172a"/>
+        <circle cx="35.5" cy="31.5" r="1.2" fill="#0f172a"/>
+        <path d="M29.5 35.5C30.5 37 33.5 37 34.5 35.5" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+        <polygon points="32,9 56,18 32,27 8,18" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+        <polygon points="32,11 52,18 32,25 12,18" fill="#22c55e"/>
+        <rect x="23" y="23" width="18" height="5" rx="2" fill="#15803d"/>
+        <path d="M32 18L50 24V34" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="50" cy="35" r="2.2" fill="#ca8a04"/>
+        <circle cx="32" cy="18" r="2" fill="#ca8a04"/>
+      </svg>
+      {% endif %}
+    </div>
+
+    <div style="flex: 1; min-width: 0;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-weight: 800; font-size: 1.1rem; color: #166534;">
+          Targeting Educator: {{ preferred_tutor.full_name }}
+        </span>
+        <span style="background: #16a34a; color: #ffffff; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">
+          {{ preferred_tutor.tutor_code }}
+        </span>
+        <span style="background: #ffffff; color: #15803d; font-size: 0.76rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid #bbf7d0;">
+          {{ preferred_tutor.qualification or 'Verified Educator' }}
+        </span>
+      </div>
+      <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #15803d; line-height: 1.45;">
+        This request is automatically personalized to this educator's verified subjects and teaching areas. Administration will coordinate your trial demo directly.
+      </p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main Request Form -->
+  <form method="post" action="{{ url_for('main.parent_request_new') }}" id="tuitionRequestForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if preferred_tutor %}
+    <input type="hidden" name="preferred_tutor_id" value="{{ preferred_tutor.id }}">
+    {% endif %}
+
+    <!-- ══ CARD 1: ACADEMIC DETAILS ══ -->
+    <div style="background: #ffffff; border-radius: 16px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #4f46e5 0%, #818cf8 100%);"></div>
+      
+      <div style="padding: 26px 30px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1.5px solid #f1f5f9; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+              📚
+            </div>
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">Academic Requirements</h2>
+              <small style="color: #64748b; font-size: 0.84rem;">Select the student's grade level, subject, and teaching mode</small>
+            </div>
+          </div>
+
+          {% if preferred_tutor %}
+          <span style="background: #ecfdf5; color: #065f46; font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 4px;">
+            <span>✓</span> Filtered for {{ preferred_tutor.full_name.split()[0] }}
+          </span>
+          {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; margin-bottom: 22px;">
+          <!-- Class / Grade -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              🎓 Class / Grade Level <span style="color: #ef4444;">*</span>
+            </label>
+            <div style="position: relative;">
+              <select name="class_id" required style="width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; color: #0f172a; transition: all 0.2s; outline: none; -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                <option value="">-- Choose Student's Class --</option>
+                {% for item in catalogs['class'] %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% if preferred_tutor %}
+            <small style="color: #059669; font-size: 0.8rem; display: block; margin-top: 5px; font-weight: 500;">
+              ✨ Verified classes taught by {{ preferred_tutor.full_name }}
+            </small>
+            {% endif %}
+          </div>
+
+          <!-- Primary Subject -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              📖 Primary Subject <span style="color: #ef4444;">*</span>
+            </label>
+            <div style="position: relative;">
+              <select name="subject_id" required style="width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; color: #0f172a; transition: all 0.2s; outline: none; -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                <option value="">-- Choose Subject --</option>
+                {% for item in catalogs['subject'] %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% if preferred_tutor %}
+            <small style="color: #059669; font-size: 0.8rem; display: block; margin-top: 5px; font-weight: 500;">
+              ✨ Core expertise of {{ preferred_tutor.full_name }}
+            </small>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Teaching Mode Selector Cards -->
+        <div style="margin-bottom: 22px;">
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+            🏠 Teaching Mode <span style="color: #ef4444;">*</span>
+          </label>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            {% for item in catalogs['mode'] %}
+            <label class="mode-card" style="border: 1.5px solid {% if loop.first %}#4f46e5{% else %}#e2e8f0{% endif %}; background: {% if loop.first %}#f5f3ff{% else %}#f8fafc{% endif %}; border-radius: 12px; padding: 14px 16px; cursor: pointer; display: flex; align-items: flex-start; gap: 12px; transition: all 0.2s;" onclick="selectMode('{{ item.id }}', this)">
+              <input type="radio" name="mode_id_radio" value="{{ item.id }}" {% if loop.first %}checked{% endif %} style="margin-top: 3px; accent-color: #4f46e5;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.92rem; color: #0f172a;">
+                  {% if 'Home' in item.name %}🏠 {{ item.name }}{% elif 'Online' in item.name %}💻 {{ item.name }}{% else %}🏫 {{ item.name }}{% endif %}
+                </div>
+                <div style="font-size: 0.78rem; color: #64748b; margin-top: 2px;">
+                  {% if 'Home' in item.name %}Educator visits your residence in Burewala{% elif 'Online' in item.name %}Live interactive digital sessions{% else %}Study at teacher's center / academy{% endif %}
+                </div>
+              </div>
+            </label>
+            {% endfor %}
+          </div>
+
+          <!-- Hidden Native Select to guarantee 100% backend compatibility -->
+          <select name="mode_id" id="native_mode_select" required style="display: none;">
+            {% for item in catalogs['mode'] %}
+            <option value="{{ item.id }}" {% if loop.first %}selected{% endif %}>{{ item.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Preferred Tutor Gender Cards -->
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+            👤 Preferred Educator Gender <span style="color: #ef4444;">*</span>
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <!-- Any -->
+            <label class="gender-card" style="border: 1.5px solid {% if not preferred_tutor or preferred_tutor.gender == 'Prefer not to say' %}#4f46e5{% else %}#e2e8f0{% endif %}; background: {% if not preferred_tutor or preferred_tutor.gender == 'Prefer not to say' %}#f5f3ff{% else %}#f8fafc{% endif %}; border-radius: 12px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onclick="selectGender('Any', this)">
+              <input type="radio" name="gender_radio" value="Any" {% if not preferred_tutor or preferred_tutor.gender == 'Prefer not to say' %}checked{% endif %} style="accent-color: #4f46e5;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #0f172a;">👥 Any Gender</div>
+                <small style="color: #64748b; font-size: 0.75rem;">Fastest match guaranteed</small>
+              </div>
+            </label>
+
+            <!-- Female -->
+            <label class="gender-card" style="border: 1.5px solid {% if preferred_tutor and preferred_tutor.gender == 'Female' %}#db2777{% else %}#e2e8f0{% endif %}; background: {% if preferred_tutor and preferred_tutor.gender == 'Female' %}#fdf2f8{% else %}#f8fafc{% endif %}; border-radius: 12px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onclick="selectGender('Female', this)">
+              <input type="radio" name="gender_radio" value="Female" {% if preferred_tutor and preferred_tutor.gender == 'Female' %}checked{% endif %} style="accent-color: #db2777;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #9d174d;">🌸 Female Tutor Only</div>
+                <small style="color: #64748b; font-size: 0.75rem;">Verified female educators</small>
+              </div>
+            </label>
+
+            <!-- Male -->
+            <label class="gender-card" style="border: 1.5px solid {% if preferred_tutor and preferred_tutor.gender == 'Male' %}#16a34a{% else %}#e2e8f0{% endif %}; background: {% if preferred_tutor and preferred_tutor.gender == 'Male' %}#f0fdf4{% else %}#f8fafc{% endif %}; border-radius: 12px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s;" onclick="selectGender('Male', this)">
+              <input type="radio" name="gender_radio" value="Male" {% if preferred_tutor and preferred_tutor.gender == 'Male' %}checked{% endif %} style="accent-color: #16a34a;">
+              <div>
+                <div style="font-weight: 700; font-size: 0.9rem; color: #166534;">🌿 Male Tutor Only</div>
+                <small style="color: #64748b; font-size: 0.75rem;">Verified male educators</small>
+              </div>
+            </label>
+          </div>
+
+          <input type="hidden" name="tutor_gender_preference" id="tutor_gender_preference_input" value="{% if preferred_tutor and preferred_tutor.gender in ['Female', 'Male'] %}{{ preferred_tutor.gender }}{% else %}Any{% endif %}">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CARD 2: LOCATION & TIMING ══ -->
+    <div style="background: #ffffff; border-radius: 16px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);"></div>
+
+      <div style="padding: 26px 30px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1.5px solid #f1f5f9;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: #fffbeb; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+            📍
+          </div>
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">Location &amp; Schedule</h2>
+            <small style="color: #64748b; font-size: 0.84rem;">Specify your area in Burewala and comfortable class timings</small>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; margin-bottom: 22px;">
+          <!-- Area -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              📍 General Area / Sector in Burewala <span style="color: #ef4444;">*</span>
+            </label>
+            <div style="position: relative;">
+              <select name="area_id" required style="width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; color: #0f172a; transition: all 0.2s; outline: none; -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                <option value="">-- Select Burewala Area --</option>
+                {% for item in catalogs['area'] %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% if preferred_tutor %}
+            <small style="color: #059669; font-size: 0.8rem; display: block; margin-top: 5px; font-weight: 500;">
+              ✨ Areas accessible to {{ preferred_tutor.full_name }}
+            </small>
+            {% endif %}
+          </div>
+
+          <!-- Street / Landmark -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              🏡 Street Address / Landmark (Optional)
+            </label>
+            <input type="text" name="subarea_text" maxlength="120" placeholder="e.g. Street #4, House #15, Near Bilal Chowk" style="width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; color: #0f172a; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+            <small style="color: #64748b; font-size: 0.78rem; display: block; margin-top: 5px;">
+              🔒 Kept completely private. Only shared with the assigned teacher after your approval.
+            </small>
+          </div>
+        </div>
+
+        <!-- Preferred Daily Timing (Dropdown + Custom) -->
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+            ⏰ Preferred Daily Timings <span style="color: #ef4444;">*</span>
+          </label>
+          <div style="position: relative;">
+            <select name="preferred_time" id="preferred_time_select" onchange="checkTimingSelection(this.value)" required style="width: 100%; padding: 12px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.95rem; background: #f8fafc; color: #0f172a; transition: all 0.2s; outline: none; -webkit-appearance: none; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M5.293%207.293a1%201%200%20011.414%200L10%2010.586l3.293-3.293a1%201%200%20111.414%201.414l-4%204a1%201%200%2001-1.414%200l-4-4a1%201%200%20010-1.414z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+              <optgroup label="Popular Afternoon &amp; Evening Slots">
+                <option value="04:00 PM – 05:00 PM (Early Evening)" selected>04:00 PM – 05:00 PM (Early Evening)</option>
+                <option value="03:00 PM – 04:00 PM (Afternoon)">03:00 PM – 04:00 PM (Afternoon)</option>
+                <option value="05:00 PM – 06:00 PM (Evening)">05:00 PM – 06:00 PM (Evening)</option>
+                <option value="06:00 PM – 07:00 PM (Evening)">06:00 PM – 07:00 PM (Evening)</option>
+                <option value="07:00 PM – 08:00 PM (Night)">07:00 PM – 08:00 PM (Night)</option>
+                <option value="08:00 PM – 09:00 PM (Night)">08:00 PM – 09:00 PM (Night)</option>
+              </optgroup>
+              <optgroup label="Morning &amp; Extended Slots">
+                <option value="09:00 AM – 10:00 AM (Morning)">09:00 AM – 10:00 AM (Morning)</option>
+                <option value="10:00 AM – 11:00 AM (Morning)">10:00 AM – 11:00 AM (Morning)</option>
+                <option value="11:00 AM – 12:00 PM (Midday)">11:00 AM – 12:00 PM (Midday)</option>
+                <option value="04:00 PM – 06:00 PM (Evening 2 Hours)">04:00 PM – 06:00 PM (Evening 2 Hours)</option>
+                <option value="05:00 PM – 07:00 PM (Evening 2 Hours)">05:00 PM – 07:00 PM (Evening 2 Hours)</option>
+              </optgroup>
+              <optgroup label="Other Options">
+                <option value="Flexible Timings">Flexible Timings (Mutually Agreed)</option>
+                <option value="__other__">+ Specify Custom Timings...</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Custom Time Input (revealed smoothly) -->
+          <div id="custom_time_wrap" style="display: none; margin-top: 10px; animation: fadeIn 0.25s ease-in-out;">
+            <input type="text" name="preferred_time_custom" id="preferred_time_custom" maxlength="120" placeholder="e.g. 4:30 PM – 5:30 PM or Weekend mornings" style="width: 100%; padding: 12px 16px; border: 2px solid #4f46e5; border-radius: 10px; font-size: 0.95rem; background: #ffffff; color: #0f172a; outline: none; box-shadow: 0 0 0 3px rgba(79,70,229,0.12);">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CARD 3: BUDGET & REQUIREMENTS ══ -->
+    <div style="background: #ffffff; border-radius: 16px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #10b981 0%, #34d399 100%);"></div>
+
+      <div style="padding: 26px 30px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1.5px solid #f1f5f9; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+              💵
+            </div>
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">Monthly Tuition Fee &amp; Needs</h2>
+              <small style="color: #64748b; font-size: 0.84rem;">Set your comfortable fee range (PKR / month)</small>
+            </div>
+          </div>
+
+          <span style="background: #ecfdf5; color: #047857; font-weight: 700; font-size: 0.78rem; padding: 4px 12px; border-radius: 999px; border: 1px solid #a7f3d0;">
+            Administration Regulated
+          </span>
+        </div>
+
+        <!-- Market Standard Rate Guidance Banner -->
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 1.5rem;">💡</span>
+            <div>
+              <div style="font-size: 0.92rem; font-weight: 800; color: #0f172a;">
+                Current Burewala Recommended Market Standard
+              </div>
+              <div style="font-size: 0.84rem; color: #64748b; margin-top: 2px;">
+                Verified home tutors in Burewala typically charge between <strong style="color: #065f46;">PKR {{ "{:,}".format(market_budget.min) }}</strong> and <strong style="color: #065f46;">PKR {{ "{:,}".format(market_budget.max) }}</strong> per month.
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Presets -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="applyPresetBudget(7000, 10000)" style="font-size: 0.78rem; font-weight: 700; background: #ffffff; border-color: #cbd5e1; color: #334155; border-radius: 8px;">
+              ⚡ Standard (7k–10k)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="applyPresetBudget(7000, 8500)" style="font-size: 0.78rem; font-weight: 700; background: #ffffff; border-color: #cbd5e1; color: #334155; border-radius: 8px;">
+              🎯 Primary (7k–8.5k)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="applyPresetBudget(8500, 10000)" style="font-size: 0.78rem; font-weight: 700; background: #ffffff; border-color: #cbd5e1; color: #334155; border-radius: 8px;">
+              🏆 Inter/Matric (8.5k–10k)
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-bottom: 22px;">
+          <!-- Min Budget -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              💵 Minimum Monthly Budget <span style="color: #ef4444;">*</span>
+            </label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 800; font-size: 0.88rem; pointer-events: none;">
+                PKR
+              </span>
+              <input type="number" id="budget_min_input" name="budget_min" value="{{ market_budget.min }}" min="1000" step="500" required style="width: 100%; padding: 12px 16px 12px 60px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 1.05rem; font-weight: 800; background: #ffffff; color: #0f172a; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#10b981'; this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+            </div>
+            <small style="color: #64748b; font-size: 0.78rem; display: block; margin-top: 5px;">Starting rate acceptable to you</small>
+          </div>
+
+          <!-- Max Budget -->
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+              💵 Maximum Monthly Budget <span style="color: #ef4444;">*</span>
+            </label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 800; font-size: 0.88rem; pointer-events: none;">
+                PKR
+              </span>
+              <input type="number" id="budget_max_input" name="budget_max" value="{{ market_budget.max }}" min="1000" step="500" required style="width: 100%; padding: 12px 16px 12px 60px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 1.05rem; font-weight: 800; background: #ffffff; color: #0f172a; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#10b981'; this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+            </div>
+            <small style="color: #64748b; font-size: 0.78rem; display: block; margin-top: 5px;">Upper limit of your monthly investment</small>
+          </div>
+        </div>
+
+        <!-- Additional Requirements & Focus Areas -->
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 8px;">
+            📝 Special Learning Requirements &amp; Exam Targets (Optional)
+          </label>
+          <textarea name="requirements" maxlength="500" rows="3" placeholder="e.g. Student is weak in Mathematics formulas and Physics numericals; needs daily homework monitoring and BISE Sahiwal board exam preparation..." style="width: 100%; padding: 14px 16px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.92rem; background: #f8fafc; color: #0f172a; resize: vertical; line-height: 1.5; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';"></textarea>
+          <small style="color: #64748b; font-size: 0.78rem; display: block; margin-top: 5px;">
+            Mention syllabus (Federal / Punjab Board / Cambridge), upcoming exams, or specific topics.
+          </small>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CARD 4: ZERO DIRECT-LEAKAGE PRIVACY FIREWALL ══ -->
+    <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 22px 26px; margin-bottom: 28px; display: flex; align-items: center; gap: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: #ffffff; border: 1.5px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+        🛡️
+      </div>
+      <div style="flex: 1; font-size: 0.88rem; color: #475569; line-height: 1.5;">
+        <strong style="color: #0f172a; font-size: 0.95rem; display: block; margin-bottom: 2px;">
+          Zero Direct-Leakage Privacy Protection · 100% Confidential
+        </strong>
+        Your phone number and private home address are strictly guarded by our platform firewall. Maria Tutor administration coordinates your trial demo directly with the teacher.
+      </div>
+    </div>
+
+    <!-- Actions & Submission -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap;">
+      <a href="{{ url_for('main.parent_dashboard') }}" class="btn btn-secondary" style="height: 48px; padding: 0 24px; font-size: 0.95rem; border-radius: 10px;">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary" style="height: 50px; padding: 0 36px; font-size: 1.05rem; font-weight: 800; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); border: none; border-radius: 10px; box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; display: inline-flex; align-items: center; gap: 8px;">
+        <span>🚀</span> Submit Tuition Request →
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+// Mode selector sync
+function selectMode(modeId, element) {
+  var nativeSelect = document.getElementById('native_mode_select');
+  if (nativeSelect) {
+    nativeSelect.value = modeId;
+  }
+  document.querySelectorAll('.mode-card').forEach(function(card) {
+    card.style.borderColor = '#e2e8f0';
+    card.style.background = '#f8fafc';
+    var radio = card.querySelector('input[type="radio"]');
+    if (radio) radio.checked = false;
+  });
+  element.style.borderColor = '#4f46e5';
+  element.style.background = '#f5f3ff';
+  var myRadio = element.querySelector('input[type="radio"]');
+  if (myRadio) myRadio.checked = true;
+}
+
+// Gender selector sync
+function selectGender(genderVal, element) {
+  var input = document.getElementById('tutor_gender_preference_input');
+  if (input) {
+    input.value = genderVal;
+  }
+  document.querySelectorAll('.gender-card').forEach(function(card) {
+    card.style.borderColor = '#e2e8f0';
+    card.style.background = '#f8fafc';
+    var radio = card.querySelector('input[type="radio"]');
+    if (radio) radio.checked = false;
+  });
+  
+  if (genderVal === 'Female') {
+    element.style.borderColor = '#db2777';
+    element.style.background = '#fdf2f8';
+  } else if (genderVal === 'Male') {
+    element.style.borderColor = '#16a34a';
+    element.style.background = '#f0fdf4';
+  } else {
+    element.style.borderColor = '#4f46e5';
+    element.style.background = '#f5f3ff';
+  }
+  var myRadio = element.querySelector('input[type="radio"]');
+  if (myRadio) myRadio.checked = true;
+}
+
+// Preset Budget Helper
+function applyPresetBudget(minVal, maxVal) {
+  var minIn = document.getElementById('budget_min_input');
+  var maxIn = document.getElementById('budget_max_input');
+  if (minIn && maxIn) {
+    minIn.value = minVal;
+    maxIn.value = maxVal;
+    minIn.style.borderColor = '#10b981';
+    maxIn.style.borderColor = '#10b981';
+    setTimeout(function() {
+      minIn.style.borderColor = '#cbd5e1';
+      maxIn.style.borderColor = '#cbd5e1';
+    }, 600);
+  }
+}
+
+// Custom Timing handler
+function checkTimingSelection(val) {
+  var wrap = document.getElementById('custom_time_wrap');
+  var input = document.getElementById('preferred_time_custom');
+  if (val === '__other__') {
+    wrap.style.display = 'block';
+    input.required = true;
+    input.focus();
+  } else {
+    wrap.style.display = 'none';
+    input.required = false;
+    input.value = '';
+  }
+}
+</script>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mode-card:hover, .gender-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Edit Parent: {{ parent.full_name }} — Admin Control{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 0 auto; padding-bottom: 50px;">
+  
+  <div class="breadcrumb" style="margin-bottom: 12px; font-size: 0.85rem; color: var(--muted);">
+    <a href="{{ url_for('superadmin.users') }}" style="color: var(--primary); text-decoration: none;">Users &amp; Governance</a> / 
+    <span>Edit Parent Profile: {{ parent.full_name }}</span>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; margin: 0 0 6px 0; color: var(--text);">
+        ✏️ Edit Parent Account: {{ parent.full_name }}
+      </h1>
+      <p style="color: var(--muted); margin: 0; font-size: 0.92rem;">
+        Administrative control. Correct parent contact information, verify account credentials, or update their tuition requests.
+      </p>
+    </div>
+    <a href="{{ url_for('superadmin.users') }}" class="btn btn-outline" style="font-size: 0.85rem;">
+      ← Back to Users
+    </a>
+  </div>
+
+  <form method="post" action="{{ url_for('admin.edit_parent', parent_id=parent.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- ══ CARD 1: PARENT DETAILS & CONTACT ══ -->
+    <section class="panel" style="margin-bottom: 24px;">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        👤 Parent Information &amp; Contact Numbers
+      </h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Parent Full Name *</span>
+          <input type="text" name="full_name" value="{{ parent.full_name }}" required maxlength="120" placeholder="e.g. Chaudhry Tariq">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Contact Phone *</span>
+          <input type="text" name="phone" value="{{ parent.user.phone or '' }}" required maxlength="32" placeholder="e.g. 0300-1234567">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Email Address</span>
+          <input type="email" name="email" value="{{ parent.user.email or '' }}" maxlength="254" placeholder="e.g. parent@mariahome.com">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Account Status</span>
+          <select name="active">
+            <option value="1" {% if parent.user.active %}selected{% endif %}>Active (Allowed to sign in)</option>
+            <option value="0" {% if not parent.user.active %}selected{% endif %}>Disabled (Blocked from sign in)</option>
+          </select>
+        </label>
+
+        <label style="grid-column: 1 / -1;">
+          <span style="font-weight: 600; font-size: 0.88rem;">Reset Password (Optional)</span>
+          <input type="password" name="new_password" placeholder="Leave blank to preserve current password. Enter new password (min 8 chars) to reset.">
+          <small class="muted" style="display: block; margin-top: 4px;">Only enter if you are helping the parent reset their login password.</small>
+        </label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+        <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-weight: 700;">
+          💾 Save Parent Profile Changes
+        </button>
+      </div>
+    </section>
+  </form>
+
+  <!-- ══ CARD 2: PARENT'S TUITION REQUESTS ══ -->
+  <section class="panel">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0 0 2px 0;">
+          📋 Tuition Requests Submitted by This Parent
+        </h2>
+        <p class="muted" style="font-size: 0.85rem; margin: 0;">Review or fix any incorrect subjects, classes, or locations chosen by the parent.</p>
+      </div>
+      <span class="badge badge-info">{{ requests|length }} Requests</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ref</th>
+            <th>Subject &amp; Class</th>
+            <th>Area / Sector</th>
+            <th>Budget</th>
+            <th>Timing</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>
+              <a href="{{ url_for('admin.request_detail', request_id=r.id) }}" style="font-family: monospace; font-weight: 700; color: var(--primary);">
+                {{ r.public_ref }}
+              </a>
+            </td>
+            <td>
+              <strong>{{ r.subject.name }}</strong>
+              <small class="muted" style="display: block;">Class: {{ r.school_class.name }}</small>
+            </td>
+            <td>
+              {{ r.area.name }}
+              {% if r.subarea_text %}<small class="muted" style="display: block;">{{ r.subarea_text }}</small>{% endif %}
+            </td>
+            <td>
+              {{ r.budget_min or '—' }}–{{ r.budget_max or '—' }} PKR
+            </td>
+            <td>
+              {{ r.preferred_time }}
+            </td>
+            <td>
+              <span class="badge badge-info">{{ r.status }}</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <a href="{{ url_for('admin.edit_request', request_id=r.id) }}" class="btn btn-sm btn-primary" style="padding: 4px 8px; font-size: 0.8rem;">
+                ✏️ Edit Request
+              </a>
+              <a href="{{ url_for('admin.request_detail', request_id=r.id) }}" class="btn btn-sm btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;">
+                View
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="empty">This parent has not posted any tuition requests yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

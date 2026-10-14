@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Tutor Review {{ tutor.tutor_code }}{% endblock %}
+{% block page_title %}Tutor Verification: {{ tutor.tutor_code }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">TUTOR {{ tutor.tutor_code }}</p>
+    <h1>{{ tutor.full_name }}</h1>
+    <span class="badge {% if tutor.verification_status == 'Approved' %}badge-success{% elif tutor.verification_status == 'Rejected' %}badge-danger{% else %}badge-warning{% endif %}">{{ tutor.verification_status }}</span>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a class="btn btn-primary" href="{{ url_for('admin.edit_tutor', tutor_id=tutor.id, next=request.path) }}">
+      ✏️ Edit Profile Details
+    </a>
+    <a class="btn btn-secondary" href="{{ url_for('admin.tutors_list') }}">← Back to Tutors</a>
+  </div>
+</div>
+
+<div class="cards two">
+  <article class="card">
+    <h2>Tutor Profile</h2>
+    <p><b>Phone:</b> {% if has_permission(current_user,'view_contacts') %}{{ tutor.user.phone }}{% else %}Restricted{% endif %}</p>
+    <p><b>Email:</b> {% if has_permission(current_user,'view_contacts') %}{{ tutor.user.email or '—' }}{% else %}Restricted{% endif %}</p>
+    <p><b>Qualification:</b> {{ tutor.qualification or '—' }}</p>
+    <p><b>Experience:</b> {{ tutor.experience or '—' }}</p>
+    <p><b>Availability:</b> {{ tutor.availability or '—' }}</p>
+    <p><b>Gender:</b> {{ tutor.gender }} · <b>CNIC Advisory Hint:</b> {{ tutor.cnic_gender_hint or '—' }}</p>
+    <p><b>Selected Catalog Items:</b> {{ tutor.catalog|map(attribute='name')|join(', ') }}</p>
+    <p><b>Expected Fee:</b> {{ tutor.expected_fee_min or '—' }}–{{ tutor.expected_fee_max or '—' }} PKR/month</p>
+    <p><b>CNIC Security:</b> Raw CNIC is never persisted in plaintext; stored as keyed HMAC-SHA256 fingerprint.</p>
+  </article>
+
+  <article class="card">
+    <h2>Verification Decision</h2>
+    {% if can_verify %}
+      <form method="post" action="{{ url_for('admin.verify_tutor',tutor_id=tutor.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Verification Status
+          <select name="status">
+            {% for s in ['Pending','Under Review','Manual review','Approved','Resubmission required','Rejected','Suspicious / restricted'] %}
+              <option {% if tutor.verification_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label style="margin-top: 10px;">Private Decision Note
+          <textarea name="note" maxlength="500" rows="4">{{ tutor.verification_note }}</textarea>
+        </label>
+        <button class="btn btn-primary" type="submit" style="margin-top: 10px;">Save Verification Decision</button>
+      </form>
+    {% else %}
+      <p class="muted">You do not have verification permission (`verify_tutors`).</p>
+    {% endif %}
+    <p class="small muted" style="margin-top: 12px;">Gender hint derived from CNIC final digit is advisory only. All document inspections are strictly audit-logged.</p>
+  </article>
+</div>
+
+<section class="section">
+  <h2>Private Document Vault</h2>
+  {% if can_docs %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Document Type</th>
+            <th>Original Filename</th>
+            <th>Uploaded</th>
+            <th>Review Status</th>
+            <th>Inspect &amp; Review</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in docs %}
+          <tr>
+            <td><strong>{{ d.document_type.replace('_',' ')|title }}</strong></td>
+            <td>{{ d.original_name }}</td>
+            <td>{{ d.uploaded_at.strftime('%d %b %Y') }}</td>
+            <td>
+              <span class="badge badge-info">{{ d.review_status }}</span>
+              {% if d.review_note %}<br><small class="muted">{{ d.review_note }}</small>{% endif %}
+            </td>
+            <td>
+              <a class="btn btn-sm btn-secondary" href="{{ url_for('admin.private_document',document_id=d.id) }}">📥 Download Privately</a>
+              {% if can_verify %}
+              <form method="post" action="{{ url_for('admin.review_document',document_id=d.id) }}" style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" style="width: auto; padding: 5px 8px;">
+                  <option value="Accepted">Accepted</option>
+                  <option value="Resubmission required">Resubmission required</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+                <input name="note" placeholder="Review note" style="width: 160px; padding: 5px 8px;">
+                <button class="btn btn-sm btn-primary" type="submit">Record Review</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty">No verification documents uploaded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="notice">Document access permission (`view_documents`) required. Every document download is audited.</p>
+  {% endif %}
+</section>
+{% endblock %}

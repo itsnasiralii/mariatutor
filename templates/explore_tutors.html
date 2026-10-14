@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block title %}Explore Verified Tutors — Burewala Marketplace{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 10px 0 40px 0;">
+
+  <!-- Header Banner -->
+  <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%); border-radius: 14px; padding: 32px 36px; margin-bottom: 28px; color: #fff; box-shadow: 0 8px 24px rgba(49, 46, 129, 0.2);">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+      <div>
+        <span style="background: rgba(255,255,255,0.15); color: #c7d2fe; font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; margin-bottom: 10px;">
+          Burewala Tutor Directory · 100% Background Checked
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.02em;">
+          Explore Areas &amp; Verified Tutors
+        </h1>
+        <p style="color: #cbd5e1; font-size: 0.95rem; margin: 0; max-width: 650px; line-height: 1.5;">
+          Browse registered home and online educators across Burewala's 12 sectors. Review academic qualifications, subject specialties, and experience before requesting a trial class.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        {% if current_user.is_authenticated and current_user.role == 'parent' %}
+        <a href="{{ url_for('main.parent_request_new') }}" class="btn" style="background: #10b981; color: #fff; font-weight: 700; padding: 12px 22px; border-radius: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+          ➕ Post Custom Tuition Request
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.register_parent') }}" class="btn" style="background: #10b981; color: #fff; font-weight: 700; padding: 12px 22px; border-radius: 8px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+          📚 Request a Tutor (Free)
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Privacy Firewall Pill Banner -->
+    <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 12px; font-size: 0.84rem; color: #e0e7ff;">
+      <span style="font-size: 1.2rem;">🛡️</span>
+      <span>
+        <strong>Zero-Bypass Privacy Protection:</strong> Teacher phone numbers and private documents are protected. Maria Tutor platform coordinates interviews and verifies identity to safeguard parents and teachers alike.
+      </span>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="panel" style="margin-bottom: 30px; padding: 22px 26px; border-radius: 12px; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+    <form method="get" action="{{ request.path }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
+      <!-- Keyword Search -->
+      <div style="grid-column: span 2; min-width: 260px;">
+        <label style="display: block; font-weight: 700; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+          🔍 Search by Name, Degree or Keyword
+        </label>
+        <input type="text" name="q" value="{{ search_keyword }}" placeholder="e.g. Mathematics, FSc, Usman, BSCS..." style="width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc;">
+      </div>
+
+      <!-- Area Filter -->
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+          📍 Area / Sector
+        </label>
+        <select name="area_id" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc;">
+          <option value="">All Burewala Areas</option>
+          {% for a in catalogs['area'] %}
+          <option value="{{ a.id }}" {% if selected_area_id == a.id %}selected{% endif %}>{{ a.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Subject Filter -->
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+          📚 Subject
+        </label>
+        <select name="subject_id" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc;">
+          <option value="">All Subjects</option>
+          {% for s in catalogs['subject'] %}
+          <option value="{{ s.id }}" {% if selected_subject_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Class Filter -->
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+          🎓 Class / Grade
+        </label>
+        <select name="class_id" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc;">
+          <option value="">All Classes</option>
+          {% for c in catalogs['class'] %}
+          <option value="{{ c.id }}" {% if selected_class_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Gender Filter -->
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.82rem; color: #334155; margin-bottom: 6px;">
+          👤 Gender
+        </label>
+        <select name="gender" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc;">
+          <option value="">All Genders</option>
+          <option value="Male" {% if selected_gender == 'Male' %}selected{% endif %}>Male Tutors</option>
+          <option value="Female" {% if selected_gender == 'Female' %}selected{% endif %}>Female Tutors</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn btn-primary" style="flex: 1; height: 42px; font-weight: 700; justify-content: center;">
+          Filter Tutors
+        </button>
+        {% if search_keyword or selected_area_id or selected_subject_id or selected_class_id or selected_gender %}
+        <a href="{{ request.path }}" class="btn btn-secondary" style="height: 42px; justify-content: center; padding: 0 14px;" title="Reset filters">
+          ✕
+        </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Count -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+    <div style="font-weight: 700; font-size: 1.05rem; color: #0f172a;">
+      Available Verified Tutors <span style="background: #e0e7ff; color: #4338ca; padding: 2px 10px; border-radius: 999px; font-size: 0.85rem; margin-left: 6px;">{{ tutors|length }}</span>
+    </div>
+    <div style="font-size: 0.85rem; color: #64748b;">
+      Showing verified educators in Burewala
+    </div>
+  </div>
+
+  <!-- Tutors Card Grid -->
+  {% if tutors %}
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
+    {% for tutor in tutors %}
+    <div class="panel" style="border-radius: 14px; background: #ffffff; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;">
+      
+      <!-- Top Accent Bar -->
+      <div style="height: 5px; background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);"></div>
+
+      <div style="padding: 24px;">
+        <!-- Card Header: Avatar + Name + Badges -->
+        <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px;">
+          <!-- Avatar Icon: Professional Graduate Cap (Girl = Pink Cap, Boy = Green Cap) -->
+          <div style="width: 54px; height: 54px; border-radius: 14px; background: {% if tutor.gender == 'Female' %}#fdf2f8{% else %}#f0fdf4{% endif %}; border: 1.5px solid {% if tutor.gender == 'Female' %}#fbcfe8{% else %}#bbf7d0{% endif %}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 4px;">
+            {% if tutor.gender == 'Female' %}
+            <!-- Professional Graduate Girl with PINK Cap -->
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 28C17 38 18 47 22 51C25 45 25 36 25 31" fill="#78350f"/>
+              <path d="M45 28C47 38 46 47 42 51C39 45 39 36 39 31" fill="#78350f"/>
+              <path d="M17 54C17 45 24 41 32 41C40 41 47 45 47 54" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+              <path d="M29 41L32 46L35 41" stroke="#be185d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#d97706" stroke-width="1.2"/>
+              <circle cx="28.5" cy="31.5" r="1.2" fill="#0f172a"/>
+              <circle cx="35.5" cy="31.5" r="1.2" fill="#0f172a"/>
+              <path d="M29.5 35.5C30.5 37 33.5 37 34.5 35.5" stroke="#be185d" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M22 28C24 23 28 21 32 21C36 21 40 23 42 28C41 24 37 23 32 23C27 23 23 24 22 28Z" fill="#92400e"/>
+              <!-- PINK Graduation Cap (Mortarboard) -->
+              <polygon points="32,9 56,18 32,27 8,18" fill="#ec4899" stroke="#be185d" stroke-width="2"/>
+              <polygon points="32,11 52,18 32,25 12,18" fill="#f472b6"/>
+              <rect x="23" y="23" width="18" height="5" rx="2" fill="#db2777"/>
+              <path d="M32 18L50 24V34" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="50" cy="35" r="2.2" fill="#ca8a04"/>
+              <circle cx="32" cy="18" r="2" fill="#ca8a04"/>
+            </svg>
+            {% else %}
+            <!-- Professional Graduate Boy with GREEN Cap -->
+            <svg width="44" height="44" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 54C16 45 23 41 32 41C41 41 48 45 48 54" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+              <path d="M28 41L32 47L36 41" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#ca8a04" stroke-width="1.2"/>
+              <path d="M22 28C22 22 26 21 32 21C38 21 42 22 42 28C42 24 39 22 32 22C25 22 22 24 22 28Z" fill="#334155"/>
+              <circle cx="28.5" cy="31.5" r="1.2" fill="#0f172a"/>
+              <circle cx="35.5" cy="31.5" r="1.2" fill="#0f172a"/>
+              <path d="M29.5 35.5C30.5 37 33.5 37 34.5 35.5" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+              <!-- GREEN Graduation Cap (Mortarboard) -->
+              <polygon points="32,9 56,18 32,27 8,18" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+              <polygon points="32,11 52,18 32,25 12,18" fill="#22c55e"/>
+              <rect x="23" y="23" width="18" height="5" rx="2" fill="#15803d"/>
+              <path d="M32 18L50 24V34" stroke="#eab308" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="50" cy="35" r="2.2" fill="#ca8a04"/>
+              <circle cx="32" cy="18" r="2" fill="#ca8a04"/>
+            </svg>
+            {% endif %}
+          </div>
+
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0; line-height: 1.3;">
+                {{ tutor.full_name }}
+              </h3>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
+              <span style="background: #ecfdf5; color: #047857; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #a7f3d0; display: inline-flex; align-items: center; gap: 3px;">
+                <span>✓</span> Verified Tutor
+              </span>
+              <span style="background: #f1f5f9; color: #475569; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">
+                {{ tutor.tutor_code }}
+              </span>
+              <span style="background: {% if tutor.gender == 'Female' %}#fdf2f8; color: #9d174d; border: 1px solid #fbcfe8;{% else %}#f0fdf4; color: #166534; border: 1px solid #bbf7d0;{% endif %} font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px;">
+                <span>{% if tutor.gender == 'Female' %}🌸{% else %}🌿{% endif %}</span> {{ tutor.gender }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qualification & Degree -->
+        <div style="background: #f8fafc; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; border: 1px solid #edf2f7;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+            🎓 Highest Qualification
+          </div>
+          <div style="font-weight: 700; font-size: 0.92rem; color: #1e293b;">
+            {{ tutor.qualification or 'Academic Degree Verified' }}
+          </div>
+        </div>
+
+        <!-- Experience & Bio -->
+        {% if tutor.experience %}
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+            💼 Experience &amp; Track Record
+          </div>
+          <p style="font-size: 0.86rem; color: #334155; margin: 0; line-height: 1.45;">
+            {{ tutor.experience }}
+          </p>
+        </div>
+        {% endif %}
+
+        <!-- Subjects Taught -->
+        <div style="margin-bottom: 14px;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+            📚 Subjects Taught
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            {% set subjs = [] %}
+            {% for item in tutor.catalog %}
+              {% if item.kind == 'subject' %}
+                <span style="background: #eef2ff; color: #3730a3; font-size: 0.76rem; font-weight: 600; padding: 3px 8px; border-radius: 4px; border: 1px solid #e0e7ff;">
+                  {{ item.name }}
+                </span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Classes Taught -->
+        <div style="margin-bottom: 14px;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+            🎯 Classes / Levels
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            {% for item in tutor.catalog %}
+              {% if item.kind == 'class' %}
+                <span style="background: #f0fdf4; color: #166534; font-size: 0.76rem; font-weight: 600; padding: 3px 8px; border-radius: 4px; border: 1px solid #dcfce7;">
+                  {{ item.name }}
+                </span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Burewala Areas Covered -->
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+            📍 Burewala Areas Covered
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            {% for item in tutor.catalog %}
+              {% if item.kind == 'area' %}
+                <span style="background: #fff7ed; color: #9a3412; font-size: 0.76rem; font-weight: 600; padding: 3px 8px; border-radius: 4px; border: 1px solid #ffedd5;">
+                  📍 {{ item.name }}
+                </span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Expected Fee & Schedule Box -->
+        <div style="background: #f8fafc; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">
+              Expected Fee Range
+            </div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #047857;">
+              PKR {{ "{:,}".format(tutor.expected_fee_min or market_budget.min) }} – {{ "{:,}".format(tutor.expected_fee_max or market_budget.max) }} <small style="font-weight: 500; font-size: 0.78rem; color: #64748b;">/ mo</small>
+            </div>
+          </div>
+          {% if tutor.availability %}
+          <div style="text-align: right;">
+            <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">
+              Timing
+            </div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: #1e293b;">
+              {{ tutor.availability[:32] }}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Strict Anti-Bypass Privacy Notice -->
+        <div style="background: #f1f5f9; border-radius: 6px; padding: 8px 12px; margin-bottom: 18px; font-size: 0.76rem; color: #475569; display: flex; align-items: center; gap: 6px;">
+          <span>🔒</span>
+          <span>Contact details protected by Maria Platform. Trial demo arranged by administration.</span>
+        </div>
+      </div>
+
+      <!-- Card Action Footer -->
+      <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #edf2f7; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <span style="font-size: 0.78rem; color: #64748b; font-weight: 600;">
+          Free Demo Guarantee
+        </span>
+
+        {% if current_user.is_authenticated and current_user.role == 'parent' %}
+        <a href="{{ url_for('main.parent_request_new', tutor_id=tutor.id) }}" class="btn btn-primary" style="font-weight: 700; font-size: 0.88rem; padding: 8px 18px; border-radius: 7px; gap: 6px; background: #4f46e5;">
+          ⭐ Request This Tutor →
+        </a>
+        {% else %}
+        <a href="{{ url_for('auth.parent_login') }}" class="btn btn-primary" style="font-weight: 700; font-size: 0.88rem; padding: 8px 18px; border-radius: 7px; gap: 6px; background: #4f46e5;">
+          ⭐ Request This Tutor →
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="panel" style="text-align: center; padding: 60px 20px; border-radius: 14px; background: #ffffff;">
+    <div style="font-size: 3rem; margin-bottom: 14px;">🔍</div>
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0 0 8px 0;">
+      No tutors matched your exact filters
+    </h3>
+    <p style="color: #64748b; font-size: 0.95rem; max-width: 520px; margin: 0 auto 24px auto;">
+      We have tutors covering all 12 Burewala sectors. You can clear your filters or submit a custom tuition request, and our team will match a verified tutor for you.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+      <a href="{{ request.path }}" class="btn btn-secondary">
+        ✕ Clear All Filters
+      </a>
+      <a href="{{ url_for('main.parent_request_new') }}" class="btn btn-primary">
+        ➕ Submit Custom Tuition Request
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

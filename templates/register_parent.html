@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Parent &amp; Guardian Registration — Maria Tutor Burewala{% endblock %}
+
+{% block content %}
+<div style="max-width: 620px; margin: 20px auto 60px;">
+
+  <!-- Hero Card -->
+  <div style="background: linear-gradient(135deg, #7c2d12 0%, #c2410c 60%, #ea580c 100%); border-radius: 16px; padding: 32px 28px; color: #fff; margin-bottom: 24px; box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.3);">
+    <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.2); padding:4px 12px; border-radius:99px; font-size:0.78rem; font-weight:700; margin-bottom:10px;">
+      👨‍👩‍👧 PARENT &amp; GUARDIAN ENROLLMENT
+    </div>
+    <h1 style="font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px;">
+      Find the Best Home or Online Tutor in Burewala
+    </h1>
+    <p style="color: #fed7aa; font-size: 0.92rem; margin: 0; line-height: 1.5;">
+      Register in 1 minute to request verified, subject-specialist tutors for your child. Your phone number and exact address remain strictly confidential.
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <div style="background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:32px 28px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.04);">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack" style="margin-bottom:20px;">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div style="display:grid; grid-template-columns: 1fr; gap:18px; margin-bottom:24px;">
+
+        <div>
+          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            Parent / Guardian Full Name *
+          </label>
+          <input name="full_name" required maxlength="120" placeholder="e.g. Chaudhry Tariq / Dr. Muhammad Asif"
+                 style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
+          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Your name or family contact person.</small>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            Email Address (Login Username) *
+          </label>
+          <input type="email" name="email" required autocomplete="email" placeholder="parent@example.com"
+                 style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
+          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Used to track tutor matching status and receive demo schedules.</small>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            Phone / WhatsApp Number *
+          </label>
+          <input name="phone" required autocomplete="tel" placeholder="0300-7654321"
+                 style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
+          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Strictly protected. Never published publicly or shown to unverified tutors.</small>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            Create Password *
+          </label>
+          <input type="password" name="password" required minlength="8" autocomplete="new-password" placeholder="Min 8 characters (A-Z, a-z, 0-9)"
+                 style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
+          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Minimum 8 characters including uppercase, lowercase, and a number.</small>
+        </div>
+
+      </div>
+
+      <!-- Privacy Reassurance -->
+      <div style="background:#fefce8; border:1px solid #fef08a; border-radius:10px; padding:14px 16px; margin-bottom:24px; display:flex; gap:12px; align-items:flex-start;">
+        <span style="font-size:1.2rem;">🔒</span>
+        <div style="font-size:0.84rem; color:#854d0e; line-height:1.4;">
+          <strong>Zero-Spam &amp; Privacy Guarantee:</strong> Tutors will only see your required subject, class, and general Burewala area (e.g., Satellite Town). Your exact house address and contact number are never released until an admin reviews and shortlists your tutor.
+        </div>
+      </div>
+
+      <button type="submit" class="btn" style="width:100%; justify-content:center; padding:14px; font-size:1.02rem; font-weight:700; background:#ea580c; color:#fff; border-radius:8px; box-shadow:0 4px 12px rgba(234, 88, 12, 0.35);">
+        Create Parent Account &amp; Proceed →
+      </button>
+
+      <div style="text-align:center; font-size:0.88rem; color:#64748b; margin-top:20px;">
+        Already registered?
+        <a href="{{ url_for('auth.parent_login') }}" style="color:#ea580c; font-weight:700; margin-left:4px;">
+          Log in to Parent Portal →
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

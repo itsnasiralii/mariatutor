@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% block title %}Commission Rules & Case Control — Maria Tutor Super Admin{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px;">
+
+  <!-- Header & Context -->
+  <div style="margin-bottom: 24px;">
+    <div class="breadcrumb" style="font-size: 0.85rem; color: #64748b; margin-bottom: 6px;">
+      <a href="{{ url_for('superadmin.dashboard') }}" style="color: #6366f1; text-decoration: none;">Super Admin</a> / 
+      <span style="color: #0f172a; font-weight: 600;">Commission Control Center</span>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div>
+        <h1 style="font-size: 1.95rem; font-weight: 800; color: #0f172a; margin: 0 0 6px 0; letter-spacing: -0.02em;">
+          💰 Commission Rules &amp; Placement Ledgers
+        </h1>
+        <p style="color: #64748b; font-size: 0.95rem; margin: 0; max-width: 780px; line-height: 1.5;">
+          Manage platform placement commissions across Burewala tuitions. Set a baseline global rule and dynamically adjust custom commission percentages per parent and tutor case based on paying capacity.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <a href="{{ url_for('admin.requests_list') }}" class="btn btn-secondary" style="font-size: 0.88rem; height: 42px;">
+          📋 Requests Queue
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ KPI METRIC CARDS ══ -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px;">
+    <!-- Active Global Rule -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+      <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+        🌐 Active Baseline Rate
+      </div>
+      <div style="font-size: 1.85rem; font-weight: 800; color: #4338ca;">
+        {{ active_rate }}{% if active_type == 'percent' %}%{% else %} PKR{% endif %}
+      </div>
+      <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">
+        {{ active_rule.name if active_rule else 'Standard Rule' }} (Global Default)
+      </div>
+    </div>
+
+    <!-- Total Registered Cases -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+      <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+        📋 Total Tuition Cases
+      </div>
+      <div style="font-size: 1.85rem; font-weight: 800; color: #0f172a;">
+        {{ requests|length }}
+      </div>
+      <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">
+        Registered across Burewala sectors
+      </div>
+    </div>
+
+    <!-- Shortlisted / Placed Tutors -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+      <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+        🎓 Assigned Educators
+      </div>
+      <div style="font-size: 1.85rem; font-weight: 800; color: #166534;">
+        {{ assigned_tutors_count or 0 }}
+      </div>
+      <div style="font-size: 0.82rem; color: #15803d; margin-top: 4px;">
+        Shortlisted or approved placements
+      </div>
+    </div>
+
+    <!-- Total Collected Commission -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.02);">
+      <div style="font-size: 0.76rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+        💵 Collected Commission
+      </div>
+      <div style="font-size: 1.85rem; font-weight: 800; color: #059669;">
+        PKR {{ total_commission_collected or 0 }}
+      </div>
+      <div style="font-size: 0.82rem; color: #047857; margin-top: 4px;">
+        Verified payment ledger balance
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1: CASE-BY-CASE DYNAMIC COMMISSION LEDGER ══ -->
+  <section style="background: #ffffff; border-radius: 16px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05); margin-bottom: 32px; overflow: hidden;">
+    <!-- Top Accent Bar -->
+    <div style="height: 4px; background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);"></div>
+
+    <div style="padding: 24px 28px;">
+      <!-- Title & Explanation -->
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1.5px solid #f1f5f9; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem;">
+            📊
+          </div>
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: 0;">
+              Live Cases &amp; Custom Commission Manager
+            </h2>
+            <small style="color: #64748b; font-size: 0.85rem;">
+              Adjust individual commission percentages for each parent &amp; tutor case according to affordability
+            </small>
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem; color: #475569;">
+          💡 <strong>Tip:</strong> Affluent parents can be set to 30%–35%, while concessional families can be set to 15%–20%.
+        </div>
+      </div>
+
+      <!-- Cases List -->
+      {% if requests %}
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for req in requests %}
+          {% set cur_type = req.commission_snapshot_type or active_type %}
+          {% set cur_val = req.commission_snapshot_value if req.commission_snapshot_value is not none else active_rate %}
+          {% set est_fee = req.budget_max or req.budget_min or 8000 %}
+          {% if cur_type == 'percent' %}
+            {% set platform_cut = ((est_fee * cur_val) / 100)|round|int %}
+          {% else %}
+            {% set platform_cut = cur_val %}
+          {% endif %}
+          {% set tutor_cut = est_fee - platform_cut %}
+
+          <div style="background: #ffffff; border: 1.5px solid {% if req.commission_snapshot_value is not none %}#c7d2fe{% else %}#e2e8f0{% endif %}; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); transition: all 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)';" onmouseout="this.style.boxShadow='0 2px 10px rgba(0,0,0,0.02)';">
+            
+            <!-- Card Top: Case Reference + Badges -->
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-weight: 800; font-size: 1.05rem; color: #0f172a;">
+                  Case {{ req.public_ref }}
+                </span>
+                <span style="background: #f1f5f9; color: #475569; font-size: 0.78rem; font-weight: 700; padding: 3px 9px; border-radius: 6px;">
+                  {{ req.subject.name }} · {{ req.school_class.name }}
+                </span>
+                <span style="background: #eef2ff; color: #4338ca; font-size: 0.78rem; font-weight: 600; padding: 3px 9px; border-radius: 6px;">
+                  📍 {{ req.area.name }}
+                </span>
+                <span class="badge {% if req.status in ['Active tuition', 'Approved', 'Introduction authorized'] %}badge-success{% elif req.status in ['Closed', 'Rejected'] %}badge-danger{% else %}badge-info{% endif %}" style="font-size: 0.75rem;">
+                  {{ req.status }}
+                </span>
+              </div>
+
+              <!-- Rate Status Pill -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                {% if req.commission_snapshot_value is not none %}
+                <span style="background: #e0e7ff; color: #3730a3; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid #c7d2fe;">
+                  ⚡ Custom Case Rate Applied
+                </span>
+                {% else %}
+                <span style="background: #f1f5f9; color: #64748b; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 999px;">
+                  🌐 Global Default ({{ active_rate }}%)
+                </span>
+                {% endif %}
+
+                <a href="{{ url_for('admin.request_detail', request_id=req.id) }}" class="btn btn-sm btn-outline" style="font-size: 0.78rem; padding: 4px 10px;">
+                  Case Pipeline →
+                </a>
+              </div>
+            </div>
+
+            <!-- Card Body Grid: Parent + Tutor + Financials -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px;">
+              
+              <!-- 1. Parent Details -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px;">
+                <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+                  👤 Parent Client
+                </div>
+                <div style="font-weight: 800; font-size: 1rem; color: #0f172a;">
+                  {{ req.parent.parent.full_name if req.parent and req.parent.parent else 'Parent Client' }}
+                </div>
+                <div style="font-size: 0.85rem; color: #475569; margin-top: 4px;">
+                  📞 Phone: <strong style="color: #0f172a;">{{ req.parent.phone }}</strong>
+                </div>
+                <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px;">
+                  💵 Stated Budget: <strong style="color: #065f46;">PKR {{ req.budget_min or '7,000' }} – {{ req.budget_max or '10,000' }}</strong>/mo
+                </div>
+              </div>
+
+              <!-- 2. Assigned Tutor Details -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px;">
+                <div style="font-size: 0.74rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+                  🎓 Assigned Educator / Tutor
+                </div>
+                {% if req.selected_tutor %}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <!-- Avatar Icon (Graduate Girl Pink Cap or Boy Green Cap) -->
+                  <div style="width: 38px; height: 38px; border-radius: 10px; background: {% if req.selected_tutor.gender == 'Female' %}#fdf2f8{% else %}#f0fdf4{% endif %}; border: 1px solid {% if req.selected_tutor.gender == 'Female' %}#fbcfe8{% else %}#bbf7d0{% endif %}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 2px;">
+                    {% if req.selected_tutor.gender == 'Female' %}
+                    <!-- Graduate Girl with PINK Cap -->
+                    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polygon points="32,9 56,18 32,27 8,18" fill="#ec4899" stroke="#be185d" stroke-width="2"/>
+                      <polygon points="32,11 52,18 32,25 12,18" fill="#f472b6"/>
+                      <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#d97706" stroke-width="1.2"/>
+                      <path d="M17 54C17 45 24 41 32 41C40 41 47 45 47 54" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+                    </svg>
+                    {% else %}
+                    <!-- Graduate Boy with GREEN Cap -->
+                    <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polygon points="32,9 56,18 32,27 8,18" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+                      <polygon points="32,11 52,18 32,25 12,18" fill="#22c55e"/>
+                      <circle cx="32" cy="32" r="10" fill="#fde68a" stroke="#ca8a04" stroke-width="1.2"/>
+                      <path d="M16 54C16 45 23 41 32 41C41 41 48 45 48 54" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+                    </svg>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div style="font-weight: 800; font-size: 0.98rem; color: #0f172a;">
+                      {{ req.selected_tutor.full_name }}
+                    </div>
+                    <div style="font-size: 0.8rem; color: #64748b;">
+                      <span style="background: #e2e8f0; padding: 1px 6px; border-radius: 4px; font-weight: 700; color: #334155;">{{ req.selected_tutor.tutor_code }}</span>
+                      · 📞 {{ req.selected_tutor.user.phone }}
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <div style="display: flex; align-items: center; gap: 8px; color: #b45309; font-weight: 600; font-size: 0.88rem; padding: 6px 0;">
+                  <span>⏳</span> Pending Tutor Shortlisting
+                </div>
+                <div style="font-size: 0.8rem; color: #64748b;">
+                  Admin can assign an educator from the case pipeline.
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- 3. Financial Calculation Preview -->
+              <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #a7f3d0; border-radius: 10px; padding: 14px 16px;">
+                <div style="font-size: 0.74rem; font-weight: 700; color: #047857; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;">
+                  💵 Financial Split (Est. Fee: PKR {{ est_fee }})
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="font-size: 0.85rem; color: #166534;">Platform Commission ({{ cur_val }}{% if cur_type == 'percent' %}%{% else %} PKR{% endif %}):</span>
+                  <span style="font-weight: 800; font-size: 1.15rem; color: #047857;">PKR {{ platform_cut or 0 }}</span>
+                </div>
+                <div style="display: flex; align-items: baseline; justify-content: space-between; border-top: 1px dashed #86efac; padding-top: 4px;">
+                  <span style="font-size: 0.82rem; color: #15803d;">Tutor Net Payout:</span>
+                  <span style="font-weight: 700; font-size: 0.95rem; color: #166534;">PKR {{ tutor_cut or 0 }}</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Card Bottom: Interactive Rate Customizer Form -->
+            <form method="post" action="{{ url_for('superadmin.commission_settings') }}" style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="action" value="update_case_commission">
+              <input type="hidden" name="request_id" value="{{ req.id }}">
+
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span style="font-weight: 700; font-size: 0.86rem; color: #1e293b;">
+                  ⚡ Adjust Commission Rate:
+                </span>
+
+                <!-- Quick Presets -->
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 15, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    15% (Concession)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 20, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    20% (Affordable)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 25, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    25% (Standard)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 30, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    30% (High Budget)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 35, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    35% (Premium)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="setRowCommission('{{ req.id }}', 50, 'percent')" style="font-size: 0.74rem; padding: 2px 8px; background: #ffffff;">
+                    50% (Half Month)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Manual Inputs & Save Button -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="number" id="comm_val_{{ req.id }}" name="commission_value" value="{{ cur_val }}" min="0" max="100000" required style="width: 80px; padding: 6px 10px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-weight: 700; font-size: 0.9rem; text-align: center;">
+                
+                <select id="comm_type_{{ req.id }}" name="commission_type" style="padding: 6px 8px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">
+                  <option value="percent" {% if cur_type == 'percent' %}selected{% endif %}>Percent (%)</option>
+                  <option value="fixed" {% if cur_type == 'fixed' %}selected{% endif %}>Fixed PKR</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary" style="height: 36px; padding: 0 16px; font-size: 0.85rem; font-weight: 700; background: #4f46e5; border-radius: 6px;">
+                  💾 Apply Rate
+                </button>
+              </div>
+            </form>
+
+          </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 40px; color: #64748b;">
+        <div style="font-size: 2rem; margin-bottom: 8px;">📭</div>
+        <p style="margin: 0; font-size: 0.95rem;">No tuition requests registered yet.</p>
+      </div>
+      {% endif %}
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2: SET GLOBAL DEFAULT COMMISSION RULE ══ -->
+  <section class="panel" style="margin-bottom: 28px; border-radius: 14px; border: 1.5px solid #e2e8f0; background: #ffffff; padding: 24px 28px;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid #f1f5f9;">
+      <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+        ⚙️
+      </div>
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Configure Global Baseline Rule</h2>
+        <small style="color: #64748b; font-size: 0.82rem;">This rule is inherited automatically by all newly registered cases unless individually customized above.</small>
+      </div>
+    </div>
+    
+    <form method="post" action="{{ url_for('superadmin.commission_settings') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: flex-end;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="save_global_rule">
+      
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; color: #1e293b; margin-bottom: 6px;">
+          Rule Name
+        </label>
+        <input name="name" required placeholder="e.g. First Month 25%, Fixed Placement Fee" value="Default Placement ({{ active_rate }}%)" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem;">
+      </div>
+      
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; color: #1e293b; margin-bottom: 6px;">
+          Calculation Type
+        </label>
+        <select name="rule_type" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem;">
+          <option value="percent" {% if active_type == 'percent' %}selected{% endif %}>Percentage (%)</option>
+          <option value="fixed" {% if active_type == 'fixed' %}selected{% endif %}>Fixed Amount (PKR)</option>
+        </select>
+      </div>
+      
+      <div>
+        <label style="display: block; font-weight: 700; font-size: 0.86rem; color: #1e293b; margin-bottom: 6px;">
+          Commission Value
+        </label>
+        <input type="number" min="0" name="value" value="{{ active_rate }}" required placeholder="e.g. 25 for percent or 2500 for PKR" style="width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem;">
+      </div>
+      
+      <div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; height: 42px; font-weight: 700; justify-content: center; background: #4f46e5; border-radius: 8px;">
+          Save Baseline Rule
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ══ SECTION 3: COMMISSION RULES HISTORY ══ -->
+  <section class="panel" style="border-radius: 14px; border: 1.5px solid #e2e8f0; background: #ffffff; padding: 24px 28px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid #f1f5f9;">
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">📜 Commission Rules Audit History</h2>
+        <small style="color: #64748b; font-size: 0.82rem;">Historical global rule versions preserved for audit integrity</small>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rule Name</th>
+            <th>Calculation Rate</th>
+            <th>Rule Status</th>
+            <th>Effective Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rules %}
+          <tr>
+            <td><strong>{{ r.name }}</strong></td>
+            <td>
+              <span class="badge badge-info">
+                {{ r.value }}{% if r.rule_type in ['percent', 'percentage'] %}%{% else %} PKR{% endif %}
+              </span>
+            </td>
+            <td>
+              {% if r.active %}
+                <span class="badge badge-success">Active Rule</span>
+              {% else %}
+                <span class="badge badge-gray">Archived</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--muted); font-size: 0.85rem;">
+              {{ r.effective_at.strftime('%Y-%m-%d %H:%M UTC') }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="empty">No commission rules recorded yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Preset Rate Helper for individual request cards
+function setRowCommission(reqId, val, type) {
+  var valInput = document.getElementById('comm_val_' + reqId);
+  var typeSelect = document.getElementById('comm_type_' + reqId);
+  if (valInput) {
+    valInput.value = val;
+    valInput.style.borderColor = '#4f46e5';
+    valInput.style.background = '#eef2ff';
+    setTimeout(function() {
+      valInput.style.borderColor = '#cbd5e1';
+      valInput.style.background = '#ffffff';
+    }, 600);
+  }
+  if (typeSelect) {
+    typeSelect.value = type;
+  }
+}
+</script>
+{% endblock %}

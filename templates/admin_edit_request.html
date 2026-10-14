@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block title %}Edit Request: {{ req.public_ref }} — Admin Pipeline{% endblock %}
+
+{% block content %}
+<div style="max-width: 980px; margin: 0 auto; padding-bottom: 50px;">
+  
+  <!-- Breadcrumb -->
+  <div class="breadcrumb" style="margin-bottom: 12px; font-size: 0.85rem; color: #64748b;">
+    <a href="{{ url_for('admin.requests_list') }}" style="color: #6366f1; text-decoration: none; font-weight: 500;">Requests Queue</a> / 
+    <a href="{{ url_for('admin.request_detail', request_id=req.id) }}" style="color: #6366f1; text-decoration: none; font-weight: 500;">Case {{ req.public_ref }}</a> / 
+    <span style="color: #0f172a; font-weight: 600;">Edit Request Parameters</span>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; margin: 0 0 6px 0; color: #0f172a; letter-spacing: -0.02em;">
+        ✏️ Edit Lead Case: {{ req.public_ref }}
+      </h1>
+      <p style="color: #64748b; margin: 0; font-size: 0.94rem;">
+        Modify academic requirements, correct subject/grade selections, or adjust budget and timing submitted by the client.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.request_detail', request_id=req.id) }}" class="btn btn-secondary" style="font-size: 0.88rem; height: 40px; padding: 0 16px; border-radius: 8px;">
+      ← Back to Case
+    </a>
+  </div>
+
+  <!-- Parent Summary Banner -->
+  <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.05); flex-shrink: 0;">
+        👤
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-weight: 800; font-size: 1.05rem; color: #0f172a;">
+            {{ req.parent.parent.full_name if req.parent and req.parent.parent else 'Parent Client' }}
+          </span>
+          <span style="background: #e0e7ff; color: #4338ca; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">
+            Parent Client
+          </span>
+        </div>
+        <div style="font-size: 0.85rem; color: #64748b; margin-top: 3px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <span>📞 Phone: <strong style="color: #0f172a;">{{ req.parent.phone }}</strong></span>
+          <span>✉️ Email: <strong style="color: #0f172a;">{{ req.parent.email or 'None' }}</strong></span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span class="badge badge-info" style="font-size: 0.85rem; padding: 6px 14px;">{{ req.status }}</span>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('admin.edit_request', request_id=req.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- ══ CARD 1: ACADEMIC PARAMETERS ══ -->
+    <div style="background: #ffffff; border-radius: 14px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 18px rgba(0,0,0,0.03); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);"></div>
+      
+      <div style="padding: 24px 28px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1.5px solid #f1f5f9;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: #eef2ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">
+            📚
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Academic Parameters &amp; Course</h2>
+            <small style="color: #64748b; font-size: 0.82rem;">Adjust primary subject, grade level, and teaching format</small>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 18px;">
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Primary Subject <span style="color: #ef4444;">*</span>
+            </label>
+            <select name="subject_id" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              {% for s in catalogs['subject'] %}
+                <option value="{{ s.id }}" {% if req.subject_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Grade / Class <span style="color: #ef4444;">*</span>
+            </label>
+            <select name="class_id" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              {% for c in catalogs['class'] %}
+                <option value="{{ c.id }}" {% if req.class_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Teaching Mode <span style="color: #ef4444;">*</span>
+            </label>
+            <select name="mode_id" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              {% for m in catalogs['mode'] %}
+                <option value="{{ m.id }}" {% if req.mode_id == m.id %}selected{% endif %}>{{ m.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Tutor Gender Preference
+            </label>
+            <select name="tutor_gender_preference" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              <option value="Any" {% if req.tutor_gender_preference == 'Any' %}selected{% endif %}>Any Gender</option>
+              <option value="Male" {% if req.tutor_gender_preference == 'Male' %}selected{% endif %}>Male Tutor Only</option>
+              <option value="Female" {% if req.tutor_gender_preference == 'Female' %}selected{% endif %}>Female Tutor Only</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CARD 2: LOCATION & TIMING ══ -->
+    <div style="background: #ffffff; border-radius: 14px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 18px rgba(0,0,0,0.03); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);"></div>
+
+      <div style="padding: 24px 28px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1.5px solid #f1f5f9;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: #fffbeb; color: #b45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">
+            📍
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Location &amp; Daily Schedule</h2>
+            <small style="color: #64748b; font-size: 0.82rem;">Burewala sector and timing requirements</small>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px;">
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Burewala Area / Sector <span style="color: #ef4444;">*</span>
+            </label>
+            <select name="area_id" required style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              {% for a in catalogs['area'] %}
+                <option value="{{ a.id }}" {% if req.area_id == a.id %}selected{% endif %}>{{ a.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Subarea / Street / Landmark
+            </label>
+            <input type="text" name="subarea_text" value="{{ req.subarea_text or '' }}" maxlength="120" placeholder="e.g. Street #3, House #12, near Jamia Masjid" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+            Preferred Daily Timing <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" name="preferred_time" value="{{ req.preferred_time }}" required maxlength="120" placeholder="e.g. 04:00 PM – 05:00 PM (Early Evening)" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ CARD 3: BUDGET & REQUIREMENTS ══ -->
+    <div style="background: #ffffff; border-radius: 14px; border: 1.5px solid #e2e8f0; box-shadow: 0 4px 18px rgba(0,0,0,0.03); margin-bottom: 24px; overflow: hidden;">
+      <div style="height: 4px; background: linear-gradient(90deg, #10b981 0%, #34d399 100%);"></div>
+
+      <div style="padding: 24px 28px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1.5px solid #f1f5f9;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;">
+            💵
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin: 0;">Tuition Fee Range &amp; Special Notes</h2>
+            <small style="color: #64748b; font-size: 0.82rem;">Monthly PKR budget constraints and syllabus focus</small>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px;">
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Minimum Budget (PKR/month)
+            </label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 700; font-size: 0.85rem;">PKR</span>
+              <input type="number" name="budget_min" value="{{ req.budget_min or '' }}" step="500" min="0" placeholder="e.g. 7000" style="width: 100%; padding: 11px 14px 11px 52px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-weight: 700; background: #ffffff; color: #0f172a;">
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              Maximum Budget (PKR/month)
+            </label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 700; font-size: 0.85rem;">PKR</span>
+              <input type="number" name="budget_max" value="{{ req.budget_max or '' }}" step="500" min="0" placeholder="e.g. 10000" style="width: 100%; padding: 11px 14px 11px 52px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-weight: 700; background: #ffffff; color: #0f172a;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; padding-top: 14px; border-top: 1px dashed #e2e8f0;">
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              💰 Case Commission Rate Value
+            </label>
+            <input type="number" name="commission_snapshot_value" value="{{ req.commission_snapshot_value if req.commission_snapshot_value is not none else '' }}" min="0" placeholder="e.g. 25 for % or 2500 for PKR" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 1rem; font-weight: 700; background: #ffffff; color: #0f172a;">
+            <small style="color: #64748b; font-size: 0.78rem;">Leave blank to inherit active global baseline.</small>
+          </div>
+
+          <div>
+            <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+              📊 Commission Type
+            </label>
+            <select name="commission_snapshot_type" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a;">
+              <option value="percent" {% if req.commission_snapshot_type != 'fixed' %}selected{% endif %}>Percentage (%)</option>
+              <option value="fixed" {% if req.commission_snapshot_type == 'fixed' %}selected{% endif %}>Fixed Amount (PKR)</option>
+            </select>
+            <small style="color: #64748b; font-size: 0.78rem;">Percentage of monthly tuition or flat placement fee.</small>
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 6px;">
+            Special Student Requirements / Notes (Max 500 chars)
+          </label>
+          <textarea name="requirements" rows="3" maxlength="500" placeholder="Describe any specific focus areas, exam syllabus (FBISE/BISE Sahiwal), or learning targets..." style="width: 100%; padding: 12px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; background: #f8fafc; color: #0f172a; resize: vertical; line-height: 1.5;">{{ req.requirements or '' }}</textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 14px; align-items: center; justify-content: flex-end;">
+      <a href="{{ url_for('admin.request_detail', request_id=req.id) }}" class="btn btn-secondary" style="height: 46px; padding: 0 22px; font-size: 0.92rem; border-radius: 8px;">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary" style="height: 46px; padding: 0 32px; font-size: 0.98rem; font-weight: 700; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); border-radius: 8px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);">
+        💾 Save Request Changes
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

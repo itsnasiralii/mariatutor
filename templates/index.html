@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% block title %}Find a Tutor in Burewala{% endblock %}
+
+{% block public_content %}
+<div class="home-layout">
+
+  <!-- Navbar -->
+  <nav class="home-nav">
+    <a class="brand" href="{{ url_for('main.index') }}">Maria Tutor · <span>Burewala</span></a>
+    <div class="home-nav-links" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <a href="{{ url_for('main.parent_explore_tutors') }}" style="display:flex; align-items:center; gap:4px; font-weight:600; color:#4338ca;">
+        <span>🔍</span> Explore Tutors
+      </a>
+      {% if current_user.is_authenticated %}
+        {% if current_user.role in ['super_admin', 'admin'] %}
+        <a href="{{ url_for('superadmin.dashboard' if current_user.role == 'super_admin' else 'admin.dashboard') }}" class="btn btn-sm btn-primary" style="font-weight:700;">
+          🏠 Admin Dashboard
+        </a>
+        {% elif current_user.role == 'tutor' %}
+        <a href="{{ url_for('main.tutor_dashboard') }}" class="btn btn-sm btn-primary" style="font-weight:700; background:#16a34a;">
+          🎓 Tutor Dashboard
+        </a>
+        {% elif current_user.role == 'parent' %}
+        <a href="{{ url_for('main.parent_dashboard') }}" class="btn btn-sm btn-primary" style="font-weight:700; background:#ea580c;">
+          👨‍👩‍👧 Parent Dashboard
+        </a>
+        {% endif %}
+        <form method="post" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-sm btn-secondary" style="font-size:0.82rem; padding:5px 12px;">
+            Log Out
+          </button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('auth.parent_login') }}" style="display:flex; align-items:center; gap:4px; font-weight:600; color:#ea580c;">
+          <span>👨‍👩‍👧</span> Parent Portal
+        </a>
+        <a href="{{ url_for('auth.tutor_login') }}" style="display:flex; align-items:center; gap:4px; font-weight:600; color:#16a34a;">
+          <span>🎓</span> Tutor Portal
+        </a>
+        <a href="{{ url_for('auth.register_parent') }}" class="btn btn-sm" style="background:#fed7aa; color:#9a3412; font-weight:700;">
+          Request a Tutor
+        </a>
+        <a href="{{ url_for('auth.register_tutor') }}" class="btn btn-sm btn-primary" style="font-weight:700;">
+          Join as Tutor
+        </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="eyebrow" style="color:#a5b4fc;margin-bottom:12px;">BUREWALA · PUNJAB · PAKISTAN</p>
+    <h1>Find the right home tutor,<br><span>through a safe &amp; verified process.</span></h1>
+    <p>Parents submit class, subjects &amp; timing needs. Verified tutors receive anonymized opportunities across Burewala's 12 sectors.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('auth.register_parent') }}" style="background:#fff;color:#4f46e5;font-weight:700;">📚 Request a Tutor (Parents)</a>
+      <a class="btn" href="{{ url_for('main.parent_explore_tutors') }}" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:700;">🔍 Explore Tutors Directory</a>
+      <a class="btn" href="{{ url_for('auth.register_tutor') }}" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);font-weight:700;">🎓 Join as a Tutor</a>
+      <a class="btn" href="{{ url_for('auth.parent_login') }}" style="background:transparent;color:#fed7aa;border:1.5px solid rgba(255,255,255,.3);">Parent Login →</a>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <strong>{{ tutor_count }}</strong>
+      <span>Approved Tutors</span>
+    </div>
+    <div class="stat-item">
+      <strong>100%</strong>
+      <span>Verified Profiles</span>
+    </div>
+    <div class="stat-item">
+      <strong>Private</strong>
+      <span>Contact Policy</span>
+    </div>
+    <div class="stat-item">
+      <strong>Free</strong>
+      <span>For Parents</span>
+    </div>
+  </div>
+
+  <!-- Interactive Portal Chooser (Parent / Tutor / Staff) -->
+  <!-- Primary Options for Parents & Tutors -->
+  <section class="features-section" style="padding-bottom: 24px;">
+    <p class="eyebrow" style="text-align:center;margin-bottom:8px;">CHOOSE YOUR PATHWAY</p>
+    <h2 style="text-align:center;margin-bottom:28px;">Connect with verified home tuition across Burewala</h2>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:28px; max-width: 960px; margin: 0 auto;">
+
+      <!-- 1. Parent Card -->
+      <div style="background:#ffffff; border:2.5px solid #fed7aa; border-radius:18px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(234,88,12,0.1); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">
+        <div>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:52px; height:52px; border-radius:14px; background:#ffedd5; display:flex; align-items:center; justify-content:center; font-size:1.8rem;">
+              👨‍👩‍👧
+            </div>
+            <div>
+              <h3 style="font-size:1.25rem; font-weight:800; color:#9a3412; margin:0;">Parents &amp; Students</h3>
+              <span style="font-size:0.84rem; color:#c2410c; font-weight:600;">Find an Expert Home or Online Tutor</span>
+            </div>
+          </div>
+          <p style="color:#64748b; font-size:0.9rem; margin-bottom:18px; line-height:1.55;">
+            Submit your child's class, subject, and area in Burewala. Our team arranges a verified tutor demo without revealing your phone number publicly.
+          </p>
+          <ul style="font-size:0.86rem; color:#475569; margin-bottom:24px; display:flex; flex-direction:column; gap:8px;">
+            <li>✓ Free tuition matching for Burewala families</li>
+            <li>✓ Verified background &amp; CNIC-checked tutors</li>
+            <li>✓ Home visits across all 12 Burewala sectors</li>
+            <li>✓ 100% private contact protection policy</li>
+          </ul>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a href="{{ url_for('auth.register_parent') }}" class="btn" style="flex:1; justify-content:center; background:#ea580c; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+            Request a Tutor →
+          </a>
+          <a href="{{ url_for('auth.parent_login') }}" class="btn" style="background:#fff; color:#ea580c; border:1.5px solid #ea580c; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px;">
+            Parent Login
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Tutor Card -->
+      <div style="background:#ffffff; border:2.5px solid #bbf7d0; border-radius:18px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(22,163,74,0.1); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">
+        <div>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:52px; height:52px; border-radius:14px; background:#dcfce7; display:flex; align-items:center; justify-content:center; font-size:1.8rem;">
+              🎓
+            </div>
+            <div>
+              <h3 style="font-size:1.25rem; font-weight:800; color:#166534; margin:0;">Tutors &amp; Teachers</h3>
+              <span style="font-size:0.84rem; color:#15803d; font-weight:600;">Teach &amp; Earn in Burewala</span>
+            </div>
+          </div>
+          <p style="color:#64748b; font-size:0.9rem; margin-bottom:18px; line-height:1.55;">
+            Build your verified tutor profile. Browse anonymized student leads across Satellite Town, College Road, Model Town, and nearby sectors.
+          </p>
+          <ul style="font-size:0.86rem; color:#475569; margin-bottom:24px; display:flex; flex-direction:column; gap:8px;">
+            <li>✓ Set your own expected monthly tuition fee</li>
+            <li>✓ Zero platform fee until confirmed placement</li>
+            <li>✓ Encrypted CNIC &amp; private degree document vault</li>
+            <li>✓ Direct spatial matching to nearby student homes</li>
+          </ul>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a href="{{ url_for('auth.register_tutor') }}" class="btn" style="flex:1; justify-content:center; background:#16a34a; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+            Join as Tutor →
+          </a>
+          <a href="{{ url_for('auth.tutor_login') }}" class="btn" style="background:#fff; color:#16a34a; border:1.5px solid #16a34a; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px;">
+            Tutor Login
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="features-section">
+    <p class="eyebrow" style="text-align:center;margin-bottom:8px;">HOW IT WORKS</p>
+    <h2>A platform-managed introduction</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>01 · Share the requirement</h3>
+        <p>Choose subject, class, Burewala area, budget and preferred time. Takes less than 2 minutes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>02 · We shortlist carefully</h3>
+        <p>Approved tutors see only a limited area-level opportunity, then choose whether to express interest.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>03 · Meet through the platform</h3>
+        <p>An admin coordinates the demo and shares contact details only at the authorized stage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coverage + Subjects -->
+  <section class="features-section" style="padding-top:0;">
+    <div class="split" style="gap:28px;align-items:start;">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">COVERAGE</p>
+            <h3 class="card-title">Starting in Burewala</h3>
+          </div>
+        </div>
+        <p style="color:var(--muted);margin-bottom:16px;">Areas and subjects are managed as the service grows. Private addresses and exact home locations are never published.</p>
+        {% if areas %}
+          <div class="tag-row">{% for a in areas %}<span class="tag">📍 {{ a.name }}</span>{% endfor %}</div>
+        {% else %}
+          <p class="muted">Burewala service areas are being set up.</p>
+        {% endif %}
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">POPULAR SUBJECTS</p>
+            <h3 class="card-title">Available Subjects</h3>
+          </div>
+        </div>
+        {% if subjects %}
+          <div class="tag-row">{% for s in subjects %}<span class="tag">📖 {{ s.name }}</span>{% endfor %}</div>
+        {% else %}
+          <p class="muted">Subjects will appear here once configured.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to find the perfect tutor?</h2>
+    <p>Join hundreds of families in Burewala who trust our platform.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a class="btn" href="{{ url_for('auth.register_parent') }}" style="background:#fff;color:#4f46e5;font-weight:700;">Get Started Free</a>
+      <a class="btn" href="{{ url_for('auth.register_tutor') }}" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Join as Tutor</a>
+    </div>
+  </section>
+
+  <footer class="home-footer">
+    <span>© 2026 Burewala Tutor Marketplace · Phase 1</span> &nbsp;·&nbsp;
+    <a href="{{ url_for('main.privacy') }}">Privacy &amp; Safety</a> &nbsp;·&nbsp;
+    <a href="{{ url_for('auth.admin_login') }}" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
+  </footer>
+</div>
+{% endblock %}
+
+

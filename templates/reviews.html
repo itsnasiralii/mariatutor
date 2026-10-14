@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Review Moderation — Maria Tutor{% endblock %}
+{% block page_title %}Review Moderation{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb">Governance / <span>Reviews</span></div>
+    <h1>Parent Review Moderation</h1>
+    <p class="muted">Verify and approve feedback submitted by parents for completed tuitions.</p>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Request Ref</th>
+        <th>Tutor</th>
+        <th>Rating</th>
+        <th>Review Body</th>
+        <th>Status</th>
+        <th>Moderate</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reviews %}
+      <tr>
+        <td><code>{{ r.request.public_ref }}</code></td>
+        <td><strong>{{ r.tutor.full_name }}</strong> ({{ r.tutor.tutor_code }})</td>
+        <td><span class="badge badge-warning">★ {{ r.rating }} / 5</span></td>
+        <td>{{ r.body }}</td>
+        <td><span class="badge badge-info">{{ r.status }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('superadmin.moderate_review' if request.endpoint and request.endpoint.startswith('superadmin') else 'admin.moderate_review', review_id=r.id) }}" style="display:flex; gap:6px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <select name="status" style="width:auto; padding:5px 8px;">
+              {% for s in ['Approved','Published','Rejected','Hidden'] %}
+                <option value="{{ s }}" {{ 'selected' if r.status == s else '' }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-primary" type="submit">Save</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">No parent reviews submitted yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

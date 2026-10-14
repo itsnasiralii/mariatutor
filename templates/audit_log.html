@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Audit Log{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 24px;">
+  <div class="breadcrumb">Admin / <span>Security & Audit</span></div>
+  <h1>System Audit Log</h1>
+  <p class="muted">Tamper-evident record of administrative actions, verification decisions, contact reveals, and system events.</p>
+</div>
+
+<section class="panel">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+    <div>
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px;">Recent Events</h2>
+      <p class="muted" style="font-size: 0.85rem;">Showing chronological action history (newest first).</p>
+    </div>
+    <span class="badge badge-info">{{ events|length }} Recorded Events</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 18%;">Timestamp</th>
+          <th style="width: 22%;">Actor Account</th>
+          <th style="width: 18%;">Action</th>
+          <th style="width: 16%;">Resource</th>
+          <th style="width: 26%;">Event Summary</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td style="color: var(--muted); font-size: 0.82rem; white-space: nowrap;">
+            {{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+          </td>
+          <td>
+            {% if e.actor %}
+              <strong>{{ e.actor.email or e.actor.phone or 'User #' ~ e.actor.id }}</strong>
+              <small class="muted" style="display: block; font-size: 0.75rem;">{{ e.actor.role|title }}</small>
+            {% else %}
+              <span class="badge badge-gray">System Automated</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge {% if 'delete' in e.action or 'remove' in e.action %}badge-danger{% elif 'create' in e.action or 'approve' in e.action %}badge-success{% elif 'release' in e.action %}badge-warning{% else %}badge-info{% endif %}">
+              {{ e.action }}
+            </span>
+          </td>
+          <td style="font-family: monospace; font-size: 0.82rem; color: var(--text);">
+            {{ e.resource_type }} #{{ e.resource_id }}
+          </td>
+          <td style="font-size: 0.88rem; color: var(--text);">
+            {{ e.summary }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="empty">No audit events recorded yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

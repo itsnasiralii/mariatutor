@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}
+  {{ 'Super Admin' if current_user.role == 'super_admin' else 'Admin' }} Dashboard
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div>
+    <p class="breadcrumb">Operations / <span>Dashboard</span></p>
+    <h1>{{ 'Super Admin' if current_user.role == 'super_admin' else 'Admin' }} Control Center</h1>
+    <p>Operational visibility for Burewala marketplace.</p>
+  </div>
+  {% if current_user.role == 'super_admin' %}
+  <div class="actions">
+    <a href="{{ url_for('superadmin.catalog_settings') }}" class="btn btn-secondary">⚙️ Settings</a>
+    <a href="{{ url_for('superadmin.system_health') }}" class="btn btn-secondary">💚 Health</a>
+    <a href="{{ url_for('superadmin.audit_log') }}" class="btn btn-primary">📜 Audit Log</a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">🎓</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.tutors }}</div>
+      <div class="stat-label">Total Tutors</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.verified_tutors }}</div>
+      <div class="stat-label">Verified Tutors</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⏳</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.pending_verification }}</div>
+      <div class="stat-label">Pending Verification</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">📋</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.requests }}</div>
+      <div class="stat-label">Parent Requests</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">🤝</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.interest }}</div>
+      <div class="stat-label">Tutor Interests</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">📚</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.active_tuitions }}</div>
+      <div class="stat-label">Active Tuitions</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">💰</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.commission_pkr }}</div>
+      <div class="stat-label">Commission PKR</div>
+    </div>
+  </div>
+  {% if current_user.role == 'super_admin' %}
+  <div class="stat-card">
+    <div class="stat-icon red">⚠️</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.unresolved_errors }}</div>
+      <div class="stat-label">Open Errors</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Quick Access Cards -->
+<div class="section">
+  <div class="section-heading">
+    <h2>Quick Actions</h2>
+  </div>
+  <div class="cards three">
+    {% if has_permission(current_user,'view_requests') %}
+    <a class="nav-card" href="{{ url_for('admin.requests_list') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">📋</div>
+      <h3>Requests &amp; Matching</h3>
+      <p>Review requests, generate eligible opportunities and see tutor interest.</p>
+    </a>
+    {% endif %}
+    {% if has_permission(current_user,'view_tutor_profiles') %}
+    <a class="nav-card" href="{{ url_for('admin.tutors_list') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">🎓</div>
+      <h3>Tutor Verification</h3>
+      <p>Review profiles and documents; record approval or resubmission.</p>
+    </a>
+    {% endif %}
+    {% if current_user.role == 'super_admin' %}
+    <a class="nav-card" href="{{ url_for('superadmin.system_health') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">💚</div>
+      <h3>System Health</h3>
+      <p>Database, private storage and recent error events.</p>
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Requests Table -->
+<div class="section">
+  <div class="section-heading">
+    <h2>Recent Requests</h2>
+    {% if has_permission(current_user,'view_requests') %}
+    <a href="{{ url_for('admin.requests_list') }}" class="btn btn-secondary btn-sm">View all →</a>
+    {% endif %}
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ref</th>
+          <th>Subject &amp; Class</th>
+          <th>Area</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent %}
+        <tr>
+          <td><span class="reference">{{ r.public_ref }}</span></td>
+          <td><strong>{{ r.subject.name }}</strong> · {{ r.school_class.name }}</td>
+          <td>📍 {{ r.area.name }}</td>
+          <td><span class="badge badge-info">{{ r.status }}</span></td>
+          <td><a href="{{ url_for('admin.request_detail', request_id=r.id) }}" class="btn btn-primary btn-sm">Open</a></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="empty">📭 No visible requests yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

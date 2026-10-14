@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}Super Admin Dashboard — Burewala Tutor Link{% endblock %}
+{% block page_title %}Super Admin Control Center{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div>
+    <p class="breadcrumb">Super Admin / <span>Dashboard</span></p>
+    <h1>Super Admin Control Center</h1>
+    <p>Complete platform governance and operations for Burewala Tutor Marketplace.</p>
+  </div>
+  <div class="actions">
+    <a href="{{ url_for('superadmin.catalog_settings') }}" class="btn btn-secondary">⚙️ Settings</a>
+    <a href="{{ url_for('superadmin.admins') }}" class="btn btn-secondary">🛡️ Admins</a>
+    <a href="{{ url_for('superadmin.audit_log') }}" class="btn btn-primary">📜 Audit Log</a>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">👥</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.total_users }}</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">🛡️</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.total_admins }}</div>
+      <div class="stat-label">Platform Admins</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">🎓</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.tutors }}</div>
+      <div class="stat-label">Total Tutors</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✅</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.verified_tutors }}</div>
+      <div class="stat-label">Verified Tutors</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">⏳</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.pending_verification }}</div>
+      <div class="stat-label">Pending Verification</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">📋</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.requests }}</div>
+      <div class="stat-label">Parent Requests</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">🤝</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.interest }}</div>
+      <div class="stat-label">Tutor Interests</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">📚</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.active_tuitions }}</div>
+      <div class="stat-label">Active Tuitions</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">💰</div>
+    <div class="stat-info">
+      <div class="stat-value">Rs. {{ stats.commission_pkr }}</div>
+      <div class="stat-label">Commission Ledger</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">⚠️</div>
+    <div class="stat-info">
+      <div class="stat-value">{{ stats.unresolved_errors }}</div>
+      <div class="stat-label">Open Errors</div>
+    </div>
+  </div>
+</div>
+
+<!-- Super Admin Management Modules -->
+<div class="section">
+  <div class="section-heading">
+    <h2>Platform Management</h2>
+  </div>
+  <div class="cards three">
+    <a class="nav-card" href="{{ url_for('superadmin.users') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">👥</div>
+      <h3>User Management</h3>
+      <p>Manage parent, tutor, and staff accounts. Activate or suspend access.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.admins') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">🛡️</div>
+      <h3>Admin Access &amp; Roles</h3>
+      <p>Create staff admin accounts and fine-tune operational permissions.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.catalog_settings') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">⚙️</div>
+      <h3>Areas &amp; Catalog</h3>
+      <p>Configure cities, sectors, subjects, grade levels, and modes.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.commission_settings') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">💰</div>
+      <h3>Commission Rules</h3>
+      <p>Set platform commission percentage or fixed fee structures.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.audit_log') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">📜</div>
+      <h3>Audit &amp; Security Logs</h3>
+      <p>Track sensitive operations, contact reveals, and verification actions.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.system_health') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">💚</div>
+      <h3>System Health &amp; Diagnostics</h3>
+      <p>Inspect database, disk storage, error traces, and environment status.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('admin.requests_list') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">📋</div>
+      <h3>Live Tuition Requests</h3>
+      <p>Review parent requirements and match with qualified tutors.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('admin.tutors_list') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">🎓</div>
+      <h3>Tutor Verification Queue</h3>
+      <p>Review submitted CNIC and academic credentials for approval.</p>
+    </a>
+    <a class="nav-card" href="{{ url_for('superadmin.reviews') }}">
+      <div style="font-size:2rem;margin-bottom:12px;">⭐</div>
+      <h3>Review Moderation</h3>
+      <p>Approve, reject, or hide parent feedback and ratings.</p>
+    </a>
+  </div>
+</div>
+
+<!-- Recent Requests -->
+<div class="section">
+  <div class="section-heading">
+    <h2>Recent Tuition Requests</h2>
+    <a href="{{ url_for('admin.requests_list') }}" class="btn btn-secondary btn-sm">View all →</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ref</th>
+          <th>Subject &amp; Class</th>
+          <th>Area</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent %}
+        <tr>
+          <td><span class="reference">{{ r.public_ref }}</span></td>
+          <td><strong>{{ r.subject.name }}</strong> · {{ r.school_class.name }}</td>
+          <td>📍 {{ r.area.name }}</td>
+          <td><span class="badge badge-info">{{ r.status }}</span></td>
+          <td><a href="{{ url_for('admin.request_detail', request_id=r.id) }}" class="btn btn-primary btn-sm">Open</a></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="empty">📭 No visible requests yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

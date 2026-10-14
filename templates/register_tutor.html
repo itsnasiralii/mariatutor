@@ -1,0 +1,923 @@
+{% extends 'base.html' %}
+{% block title %}Tutor & Teacher Registration — Maria Tutor Burewala{% endblock %}
+
+{% block content %}
+<style>
+  .reg-container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+  }
+  .reg-hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+    border-radius: 16px;
+    padding: 36px 32px;
+    color: #fff;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .reg-hero::after {
+    content: "🎓";
+    position: absolute;
+    right: 24px;
+    bottom: -15px;
+    font-size: 8rem;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .reg-hero .badge {
+    background: rgba(255, 255, 255, 0.18);
+    color: #e0e7ff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .reg-hero h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .reg-hero p {
+    color: #c7d2fe;
+    font-size: 0.96rem;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .reg-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+  .reg-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .reg-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .reg-card-title .icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ede9fe;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+  .reg-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .reg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .reg-field label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .reg-field input, .reg-field select, .reg-field textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+  .reg-field input:focus, .reg-field select:focus, .reg-field textarea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    outline: none;
+  }
+  .reg-field small {
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  /* ══ SEXY INTERACTIVE EXPERIENCE BUILDER ══ */
+  .exp-builder-box {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+  }
+  .exp-builder-box:focus-within {
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  }
+  .exp-tiers {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .exp-tier-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #fff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .exp-tier-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #ede9fe;
+  }
+  .exp-tier-btn.active {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  }
+  .exp-snippets-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .exp-snippets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .exp-chip {
+    padding: 4px 10px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .exp-chip:hover {
+    background: #ede9fe;
+    border-color: #818cf8;
+    color: #3730a3;
+    transform: translateY(-1px);
+  }
+  .exp-textarea-wrap {
+    position: relative;
+  }
+  .exp-textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.2s ease;
+  }
+  .exp-textarea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    outline: none;
+  }
+  .exp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  /* ══ INTERACTIVE CHIPS ══ */
+  .interactive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .choice-chip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .choice-chip:hover {
+    border-color: #818cf8;
+    background: #f5f3ff;
+  }
+  .choice-chip input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .choice-chip .custom-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid #94a3b8;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: transparent;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+  }
+  .choice-chip.active {
+    background: #ede9fe;
+    border-color: #6366f1;
+    color: #3730a3;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
+  }
+  .choice-chip.active .custom-indicator {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+  }
+  .trust-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    color: #166534;
+    font-size: 0.86rem;
+    margin-top: 14px;
+  }
+  .submit-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  @media (max-width: 768px) {
+    .reg-grid-2 { grid-template-columns: 1fr; gap: 16px; }
+    .interactive-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .interactive-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="reg-container">
+
+  <!-- Header Banner -->
+  <div class="reg-hero">
+    <div class="badge">
+      <span>✨</span> Burewala Verified Tutor Network · Join Faculty
+    </div>
+    <h1>Build Your Professional Tutor Profile</h1>
+    <p>
+      Connect with verified parents across Burewala's 12 sectors. Set your own fee, choose your subjects, and receive platform-coordinated student placements.
+    </p>
+  </div>
+
+  <form method="post" id="tutor-register-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Hidden final input that holds qualification for backend submission -->
+    <input type="hidden" id="final-qualification" name="qualification" value="">
+
+    <!-- STEP 1: Personal & Account Identification -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle">👤</div>
+          <div>
+            <div>1. Personal &amp; Identity Credentials</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Your CNIC is strictly protected under Pakistani privacy law &amp; encrypted.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reg-grid-2" style="margin-bottom: 18px;">
+        <div class="reg-field">
+          <label for="full_name">Full Name (with Title) *</label>
+          <input id="full_name" name="full_name" required maxlength="120" placeholder="e.g. Sir Usman Ali / Madam Ayesha">
+          <small>As written on your educational degrees.</small>
+        </div>
+
+        <div class="reg-field">
+          <label for="phone">Phone / WhatsApp Number *</label>
+          <input id="phone" name="phone" required autocomplete="tel" placeholder="0300-1234567">
+          <small>Private; only released after you accept shortlisted tuition lead.</small>
+        </div>
+      </div>
+
+      <div class="reg-grid-2" style="margin-bottom: 18px;">
+        <div class="reg-field">
+          <label for="cnic-input">
+            <span>Pakistani CNIC Number *</span>
+            <span id="cnic-badge" style="display:none; font-size:0.75rem; padding:2px 8px; border-radius:99px; background:#dcfce7; color:#15803d; font-weight:700;"></span>
+          </label>
+          <input id="cnic-input" name="cnic" required placeholder="36402-XXXXXXX-X" maxlength="15" autocomplete="username">
+          <small id="cnic-hint-msg" style="color:#64748b;">
+            13 digits with hyphens (e.g. 36402-1234567-1). Stored as salted HMAC-SHA256 fingerprint.
+          </small>
+        </div>
+
+        <div class="reg-field">
+          <label for="gender-select">Gender *</label>
+          <select id="gender-select" name="gender" required>
+            <option value="Prefer not to say">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <small id="gender-hint">Pre-filled automatically from CNIC's final digit (odd = Male, even = Female).</small>
+        </div>
+      </div>
+
+      <div class="reg-grid-2">
+        <div class="reg-field">
+          <label for="email">Email Address (Optional)</label>
+          <input id="email" type="email" name="email" autocomplete="email" placeholder="tutor@example.com">
+          <small>Used for tuition opportunity notifications &amp; password recovery.</small>
+        </div>
+
+        <div class="reg-field">
+          <label for="password">Create Secret Password *</label>
+          <input id="password" type="password" name="password" required minlength="8" autocomplete="new-password" placeholder="Min 8 characters (A-Z, a-z, 0-9)">
+          <small>Must include uppercase letter, lowercase letter, and a number.</small>
+        </div>
+      </div>
+
+      <div class="trust-banner">
+        <span style="font-size: 1.3rem;">🔒</span>
+        <div>
+          <strong>Pakistani CNIC Protection &amp; Zero-Leakage Policy:</strong>
+          Parents will NEVER see your raw CNIC or private identity records. Documents are stored in an encrypted vault outside public web roots and accessed solely by authorized staff for quality verification.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Qualifications & Tutoring Profile -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle" style="background:#dbeafe; color:#2563eb;">🎓</div>
+          <div>
+            <div>2. Qualifications, Experience &amp; Fee Expectation</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Highlight your expertise to increase your match rank in Burewala.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Qualification Dropdown with 45+ Common Pakistani Degrees -->
+      <div class="reg-field" style="margin-bottom: 16px;">
+        <label for="qualification-select">
+          <span>Highest Academic Qualification Degree *</span>
+          <span style="font-size:0.75rem; color:#6366f1; font-weight:600;">Pakistani Degrees (Admin Managed)</span>
+        </label>
+        <select id="qualification-select" required onchange="handleQualificationChange()">
+          <option value="">-- Choose Your Degree --</option>
+          {% for item in choices if item.kind == 'qualification' %}
+            <option value="{{ item.name }}">{{ item.name }}</option>
+          {% endfor %}
+          <option value="__other__" style="font-weight:700; color:#4f46e5;">✨ Other (Specify custom / unlisted degree)</option>
+        </select>
+      </div>
+
+      <!-- Smooth "Other" Custom Degree Input Container -->
+      <div id="other-degree-container" style="display:none; padding:14px; background:#f5f3ff; border:1.5px dashed #a5b4fc; border-radius:10px; margin-bottom:16px;">
+        <label for="custom-degree-input" style="color:#3730a3; font-weight:700; font-size:0.85rem; margin-bottom:4px;">
+          Type Your Specific Degree / Major / University:
+        </label>
+        <input id="custom-degree-input" name="qualification_custom" maxlength="150" placeholder="e.g. M.Sc Physics (Govt College Burewala) or BS Data Science"
+               oninput="syncCustomQualification()"
+               style="background:#fff; border-color:#818cf8;">
+        <small style="color:#6366f1;">This custom degree will be recorded on your verified tutor profile.</small>
+      </div>
+
+      <!-- SEXY INTERACTIVE EXPERIENCE BUILDER -->
+      <div class="exp-builder-box" style="margin-bottom: 20px;">
+        <div class="exp-snippets-label">1. Quick Experience Tier</div>
+        <div class="exp-tiers">
+          <div class="exp-tier-btn" onclick="selectExpTier('0-1 Year (Fresh / Passionate Tutor)', this)">
+            🌟 0–1 Year (Starter)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('1-3 Years (Experienced Home Tutor)', this)">
+            ⭐ 1–3 Years (Home Tutor)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('3-5 Years (Senior Academy & Home Specialist)', this)">
+            🏆 3–5 Years (Senior Specialist)
+          </div>
+          <div class="exp-tier-btn" onclick="selectExpTier('5+ Years (Master Faculty / College Lecturer)', this)">
+            👑 5+ Years (Master Faculty)
+          </div>
+        </div>
+
+        <div class="exp-snippets-label">2. Click to Insert Highlights</div>
+        <div class="exp-snippets">
+          <span class="exp-chip" onclick="appendExpSnippet('🏫 Taught at Aspire / Punjab College Burewala.')">+ 🏫 College / Academy Faculty</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🎯 Guided 25+ Matric & FSc students to 90%+ board marks.')">+ 🎯 90%+ Board Exam Results</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🔬 Conceptual science & numerical physics specialist.')">+ 🔬 Conceptual Sciences</span>
+          <span class="exp-chip" onclick="appendExpSnippet('📐 Step-by-step mathematics theorem and problem solver.')">+ 📐 Math Problem Solver</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🏠 4+ years providing personalized home tuitions in Satellite Town and Model Town.')">+ 🏠 Burewala Home Tuitions</span>
+          <span class="exp-chip" onclick="appendExpSnippet('💻 Interactive online classes with digital pen tablet.')">+ 💻 Digital Whiteboard</span>
+          <span class="exp-chip" onclick="appendExpSnippet('🇬🇧 Experienced in Cambridge O/A Levels past paper solving.')">+ 🇬🇧 O/A Levels Cambridge</span>
+        </div>
+
+        <div class="exp-textarea-wrap">
+          <textarea id="experience-area" name="experience" class="exp-textarea" maxlength="500" placeholder="Describe which schools, colleges, academies or past home tuition students you have taught in Burewala (e.g. 5 years teaching FSc Physics at Aspire College Burewala. Guided students to achieve A+ grades in Sahiwal/Multan Board exams)..." oninput="updateCharCount()"></textarea>
+        </div>
+
+        <div class="exp-footer">
+          <span>💡 Tip: Parents love reading specific achievements and past schools taught in Burewala.</span>
+          <span id="char-count" style="font-weight:700; color:#4f46e5;">0 / 500 chars</span>
+        </div>
+      </div>
+
+      <!-- Availability & Fee Expectations with Dynamic Database Catalog -->
+      <div class="reg-grid-2" style="margin-bottom: 18px;">
+        <div class="reg-field">
+          <label for="timing-select">
+            <span>Daily Availability &amp; Timings *</span>
+            <span style="font-size:0.75rem; color:#6366f1; font-weight:600;">Timing Slots (Admin Managed)</span>
+          </label>
+          <select id="timing-select" required onchange="handleTimingChange()">
+            <option value="">-- Select Daily Availability --</option>
+            {% for item in choices if item.kind == 'timing' %}
+              <option value="{{ item.name }}">{{ item.name }}</option>
+            {% endfor %}
+            <option value="__other__" style="font-weight:700; color:#4f46e5;">✨ Other (Specify custom timing)</option>
+          </select>
+
+          <!-- Hidden final input that holds availability for backend submission -->
+          <input type="hidden" id="final-availability" name="availability" value="">
+
+          <!-- Smooth "Other" Custom Timing Input Container -->
+          <div id="other-timing-container" style="display:none; padding:12px; background:#f0fdf4; border:1.5px dashed #86efac; border-radius:8px; margin-top:8px;">
+            <label for="custom-timing-input" style="color:#15803d; font-weight:700; font-size:0.82rem; margin-bottom:4px;">
+              Type Your Custom Schedule &amp; Timings:
+            </label>
+            <input id="custom-timing-input" name="availability_custom" maxlength="200" placeholder="e.g. Daily 6:30 PM - 8:30 PM or Alternate Days"
+                   oninput="syncCustomTiming()"
+                   style="background:#fff; border-color:#86efac;">
+            <small style="color:#15803d;">Your custom timing will be shown to matching parents.</small>
+          </div>
+
+          <!-- Quick Fill Shortcut Pills -->
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+            {% for item in choices if item.kind == 'timing' %}
+              <span class="exp-chip" onclick="quickSelectTiming('{{ item.name|replace("'", "\\'") }}')">+ {{ item.name.split('(')[-1].replace(')', '') if '(' in item.name else item.name[:18] }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="reg-grid-2" style="gap:10px;">
+          <div class="reg-field">
+            <label for="expected_fee_min">Min Fee (PKR / Month)</label>
+            <div style="position:relative;">
+              <span style="position:absolute; left:12px; top:11px; font-weight:700; color:#64748b; font-size:0.85rem;">Rs.</span>
+              <input id="expected_fee_min" type="number" name="expected_fee_min" min="0" step="500" value="{{ market_budget.min }}" placeholder="{{ '{:,}'.format(market_budget.min) }}" style="padding-left:42px;">
+            </div>
+            <small>Market base: PKR {{ "{:,}".format(market_budget.min) }} / mo.</small>
+          </div>
+
+          <div class="reg-field">
+            <label for="expected_fee_max">Max Fee (PKR / Month)</label>
+            <div style="position:relative;">
+              <span style="position:absolute; left:12px; top:11px; font-weight:700; color:#64748b; font-size:0.85rem;">Rs.</span>
+              <input id="expected_fee_max" type="number" name="expected_fee_max" min="0" step="500" value="{{ market_budget.max }}" placeholder="{{ '{:,}'.format(market_budget.max) }}" style="padding-left:42px;">
+            </div>
+            <small>Market standard: PKR {{ "{:,}".format(market_budget.max) }} / mo.</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STEP 3: Burewala Teaching Locations -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle" style="background:#ffedd5; color:#ea580c;">📍</div>
+          <div>
+            <div>3. Burewala Teaching Locations</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Select the areas where you are willing to visit for home tuition.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('area')">
+          Toggle All Areas
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-area">
+        {% for item in choices if item.kind == 'area' %}
+        <label class="choice-chip" data-kind="area" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}">
+          <div class="custom-indicator">✓</div>
+          <span>📍 {{ item.name }}</span>
+        </label>
+        {% else %}
+        <span class="muted">No areas configured in database.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- STEP 4: Academic Subjects -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle" style="background:#dcfce7; color:#16a34a;">📚</div>
+          <div>
+            <div>4. Academic Subjects You Can Teach</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Select all subjects in which you have strong conceptual mastery.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('subject')">
+          Toggle All Subjects
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-subject">
+        {% for item in choices if item.kind == 'subject' %}
+        <label class="choice-chip" data-kind="subject" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}">
+          <div class="custom-indicator">✓</div>
+          <span>📖 {{ item.name }}</span>
+        </label>
+        {% else %}
+        <span class="muted">No subjects configured in database.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- STEP 5: School & College Classes -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle" style="background:#fef3c7; color:#d97706;">🏫</div>
+          <div>
+            <div>5. Classes &amp; Grade Levels</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              Indicate the target student levels you are qualified to tutor.
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllCategory('class')">
+          Toggle All Classes
+        </button>
+      </div>
+
+      <div class="interactive-grid" id="grid-class">
+        {% for item in choices if item.kind == 'class' %}
+        <label class="choice-chip" data-kind="class" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}">
+          <div class="custom-indicator">✓</div>
+          <span>🎒 {{ item.name }}</span>
+        </label>
+        {% else %}
+        <span class="muted">No classes configured in database.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- STEP 6: Teaching Modes -->
+    <div class="reg-card">
+      <div class="reg-card-head">
+        <div class="reg-card-title">
+          <div class="icon-circle" style="background:#fee2e2; color:#dc2626;">🚗</div>
+          <div>
+            <div>6. Teaching Mode Preference</div>
+            <div style="font-size:0.8rem; color:#64748b; font-weight:normal; margin-top:2px;">
+              How would you like to deliver your tuition sessions?
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-grid" id="grid-mode">
+        {% for item in choices if item.kind == 'mode' %}
+        <label class="choice-chip active" data-kind="mode" onclick="handleChipClick(this)">
+          <input type="checkbox" name="catalog_ids" value="{{ item.id }}" checked>
+          <div class="custom-indicator">✓</div>
+          <span>🌐 {{ item.name }}</span>
+        </label>
+        {% else %}
+        <span class="muted">No modes configured in database.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Submit Bar & Consent -->
+    <div class="submit-bar">
+      <label class="check consent" style="display:flex; align-items:flex-start; gap:12px; cursor:pointer; font-weight:normal; font-size:0.88rem; color:#334155;">
+        <input type="checkbox" required style="width:18px; height:18px; margin-top:2px; accent-color:#4f46e5;">
+        <span>
+          <strong>Tutor Code of Conduct:</strong> I solemnly declare that all personal credentials, educational qualifications, and contact details provided are genuine. I understand that my profile will be verified by the Maria Tutor management team before being matched with parent leads in Burewala.
+        </span>
+      </label>
+
+      <button type="submit" class="btn btn-primary" style="padding:14px 28px; font-size:1.05rem; font-weight:700; justify-content:center; box-shadow:0 4px 14px rgba(79, 70, 229, 0.4); border-radius:10px;">
+        🚀 Submit Application &amp; Create Tutor Profile →
+      </button>
+
+      <div style="text-align:center; font-size:0.88rem; color:#64748b; margin-top:4px;">
+        Already registered as a tutor?
+        <a href="{{ url_for('auth.tutor_login') }}" style="color:#4f46e5; font-weight:700; margin-left:4px;">
+          Log in with CNIC / Tutor ID →
+        </a>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+// ══ QUALIFICATION & TIMING DROPDOWN LOGIC ══
+function handleQualificationChange() {
+  const select = document.getElementById('qualification-select');
+  const otherContainer = document.getElementById('other-degree-container');
+  const customInput = document.getElementById('custom-degree-input');
+  const finalInput = document.getElementById('final-qualification');
+
+  if (select.value === '__other__') {
+    otherContainer.style.display = 'block';
+    customInput.focus();
+    finalInput.value = customInput.value.trim();
+  } else {
+    otherContainer.style.display = 'none';
+    finalInput.value = select.value;
+  }
+}
+
+function syncCustomQualification() {
+  const customInput = document.getElementById('custom-degree-input');
+  const finalInput = document.getElementById('final-qualification');
+  finalInput.value = customInput.value.trim();
+}
+
+function handleTimingChange() {
+  const select = document.getElementById('timing-select');
+  const otherContainer = document.getElementById('other-timing-container');
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+
+  if (select.value === '__other__') {
+    otherContainer.style.display = 'block';
+    customInput.focus();
+    finalInput.value = customInput.value.trim();
+  } else {
+    otherContainer.style.display = 'none';
+    finalInput.value = select.value;
+  }
+}
+
+function syncCustomTiming() {
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+  finalInput.value = customInput.value.trim();
+}
+
+function quickSelectTiming(timing) {
+  const select = document.getElementById('timing-select');
+  const otherContainer = document.getElementById('other-timing-container');
+  const customInput = document.getElementById('custom-timing-input');
+  const finalInput = document.getElementById('final-availability');
+
+  let matched = false;
+  for (let i = 0; i < select.options.length; i++) {
+    if (select.options[i].value === timing) {
+      select.selectedIndex = i;
+      matched = true;
+      break;
+    }
+  }
+  if (matched) {
+    otherContainer.style.display = 'none';
+    finalInput.value = timing;
+  } else {
+    select.value = '__other__';
+    otherContainer.style.display = 'block';
+    customInput.value = timing;
+    finalInput.value = timing;
+  }
+}
+
+// ══ EXPERIENCE BUILDER LOGIC ══
+function selectExpTier(tierText, btnEl) {
+  document.querySelectorAll('.exp-tier-btn').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+
+  const area = document.getElementById('experience-area');
+  const tierPrefix = "Experience: " + tierText + ". ";
+  if (!area.value.includes(tierText)) {
+    area.value = tierPrefix + area.value;
+  }
+  updateCharCount();
+  area.focus();
+}
+
+function appendExpSnippet(snippet) {
+  const area = document.getElementById('experience-area');
+  const cur = area.value.trim();
+  if (cur.length > 0) {
+    area.value = cur + " " + snippet;
+  } else {
+    area.value = snippet;
+  }
+  updateCharCount();
+  area.focus();
+}
+
+function updateCharCount() {
+  const area = document.getElementById('experience-area');
+  const counter = document.getElementById('char-count');
+  if (area && counter) {
+    const len = area.value.length;
+    counter.textContent = len + ' / 500 chars';
+    if (len > 480) {
+      counter.style.color = '#dc2626';
+    } else {
+      counter.style.color = '#4f46e5';
+    }
+  }
+}
+
+// ══ CHIP INTERACTION LOGIC ══
+function handleChipClick(labelEl) {
+  setTimeout(() => {
+    const input = labelEl.querySelector('input[type="checkbox"]');
+    if (input) {
+      if (input.checked) {
+        labelEl.classList.add('active');
+      } else {
+        labelEl.classList.remove('active');
+      }
+    }
+  }, 10);
+}
+
+function toggleAllCategory(kind) {
+  const chips = document.querySelectorAll('.choice-chip[data-kind="' + kind + '"]');
+  const allChecked = Array.from(chips).every(c => c.querySelector('input').checked);
+  chips.forEach(c => {
+    const input = c.querySelector('input');
+    input.checked = !allChecked;
+    if (input.checked) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const cnicInput = document.getElementById('cnic-input');
+  const genderSelect = document.getElementById('gender-select');
+  const hintMsg = document.getElementById('cnic-hint-msg');
+  const cnicBadge = document.getElementById('cnic-badge');
+
+  updateCharCount();
+
+  // Sync initial checked states
+  document.querySelectorAll('.choice-chip').forEach(c => {
+    const input = c.querySelector('input');
+    if (input && input.checked) {
+      c.classList.add('active');
+    }
+  });
+
+  // Ensure final qualification and availability are synced before submitting
+  document.getElementById('tutor-register-form').addEventListener('submit', function() {
+    const qualSelect = document.getElementById('qualification-select');
+    const qualCustom = document.getElementById('custom-degree-input');
+    const qualFinal = document.getElementById('final-qualification');
+
+    if (qualSelect.value === '__other__') {
+      qualFinal.value = qualCustom.value.trim() || 'Other';
+    } else {
+      qualFinal.value = qualSelect.value;
+    }
+
+    const availSelect = document.getElementById('timing-select');
+    const availCustom = document.getElementById('custom-timing-input');
+    const availFinal = document.getElementById('final-availability');
+    if (availSelect.value === '__other__') {
+      availFinal.value = availCustom.value.trim() || 'Flexible Timings';
+    } else {
+      availFinal.value = availSelect.value;
+    }
+  });
+
+  // Pakistani CNIC automatic hyphen formatting & gender detection
+  if (cnicInput) {
+    cnicInput.addEventListener('input', function(e) {
+      let val = cnicInput.value.replace(/\D/g, ''); // digits only
+      if (val.length > 13) val = val.slice(0, 13);
+
+      let formatted = '';
+      if (val.length > 0) {
+        formatted = val.slice(0, 5);
+        if (val.length > 5) {
+          formatted += '-' + val.slice(5, 12);
+          if (val.length > 12) {
+            formatted += '-' + val.slice(12, 13);
+          }
+        }
+      }
+      cnicInput.value = formatted;
+
+      // When 13 digits are complete:
+      if (val.length === 13) {
+        const lastDigit = parseInt(val.slice(-1), 10);
+        const detectedGender = (lastDigit % 2 === 1) ? 'Male' : 'Female';
+        
+        if (genderSelect && genderSelect.value === 'Prefer not to say') {
+          genderSelect.value = detectedGender;
+        }
+
+        if (cnicBadge) {
+          cnicBadge.style.display = 'inline-block';
+          cnicBadge.textContent = '✓ ' + detectedGender + ' detected';
+        }
+
+        if (hintMsg) {
+          hintMsg.innerHTML = '<span style="color:#15803d; font-weight:600;">✓ Valid Pakistani CNIC format.</span> Last digit ' + lastDigit + ' indicates ' + detectedGender + '.';
+        }
+      } else {
+        if (cnicBadge) cnicBadge.style.display = 'none';
+        if (hintMsg) {
+          hintMsg.style.color = '#64748b';
+          hintMsg.textContent = '13 digits with hyphens (e.g. 36402-1234567-1). Stored as salted HMAC-SHA256 fingerprint.';
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

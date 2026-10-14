@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Maria Tutor — Burewala Tutor Marketplace{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=20261014_3">
+</head>
+<body>
+
+{% if current_user.is_authenticated and request.endpoint != 'main.index' %}
+<!-- ══ AUTHENTICATED LAYOUT — Sidebar + Main ══ -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a class="brand-logo" href="{{ url_for('main.index') }}" style="text-decoration:none;">
+        <div class="icon">🎓</div>
+        <div>
+          <div>Maria Tutor</div>
+          <small>Burewala Marketplace</small>
+        </div>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <!-- Common -->
+      <div class="nav-section-title">Main</div>
+      {% if current_user.role == 'super_admin' %}
+      <a href="{{ url_for('superadmin.dashboard') }}" class="{% if request.endpoint == 'superadmin.dashboard' %}active{% endif %}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      {% elif current_user.role == 'admin' %}
+      <a href="{{ url_for('admin.dashboard') }}" class="{% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      {% elif current_user.role == 'tutor' %}
+      <a href="{{ url_for('main.tutor_dashboard') }}" class="{% if request.endpoint == 'main.tutor_dashboard' %}active{% endif %}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      {% elif current_user.role == 'parent' %}
+      <a href="{{ url_for('main.parent_dashboard') }}" class="{% if request.endpoint == 'main.parent_dashboard' %}active{% endif %}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      {% else %}
+      <a href="{{ url_for('main.dashboard') }}">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      {% endif %}
+
+      <!-- Tutor Links -->
+      {% if current_user.role == 'tutor' %}
+      <div class="nav-section-title">Tutor Operations</div>
+      <a href="{{ url_for('main.tutor_dashboard') }}" class="{% if request.endpoint == 'main.tutor_dashboard' %}active{% endif %}">
+        <span class="nav-icon">💼</span> Tuition Leads
+      </a>
+      <a href="{{ url_for('main.tutor_profile') }}" class="{% if request.endpoint == 'main.tutor_profile' %}active{% endif %}">
+        <span class="nav-icon">👤</span> My Profile &amp; Subjects
+      </a>
+      <a href="{{ url_for('main.tutor_documents') }}" class="{% if request.endpoint == 'main.tutor_documents' %}active{% endif %}">
+        <span class="nav-icon">📄</span> Identity Documents
+      </a>
+      {% endif %}
+
+      <!-- Parent Links -->
+      {% if current_user.role == 'parent' %}
+      <div class="nav-section-title">Parent Operations</div>
+      <a href="{{ url_for('main.parent_dashboard') }}" class="{% if request.endpoint == 'main.parent_dashboard' %}active{% endif %}">
+        <span class="nav-icon">📋</span> My Tuition Requests
+      </a>
+      <a href="{{ url_for('main.parent_request_new') }}" class="{% if request.endpoint == 'main.parent_request_new' %}active{% endif %}">
+        <span class="nav-icon">➕</span> Request a New Tutor
+      </a>
+      <a href="{{ url_for('main.parent_explore_tutors') }}" class="{% if request.endpoint == 'main.parent_explore_tutors' %}active{% endif %}">
+        <span class="nav-icon">🔍</span> Explore Areas &amp; Tutors
+      </a>
+      {% endif %}
+
+      <!-- Admin Links -->
+      {% if current_user.role in ['admin','super_admin'] %}
+      <div class="nav-section-title">Operations</div>
+      {% if has_permission(current_user,'view_requests') %}
+      <a href="{{ url_for('admin.requests_list') }}" class="{% if request.endpoint == 'admin.requests_list' %}active{% endif %}">
+        <span class="nav-icon">📋</span> Requests Queue
+      </a>
+      {% endif %}
+      {% if has_permission(current_user,'view_tutor_profiles') %}
+      <a href="{{ url_for('admin.tutors_list') }}" class="{% if request.endpoint == 'admin.tutors_list' %}active{% endif %}">
+        <span class="nav-icon">🎓</span> Tutors Verification
+      </a>
+      {% endif %}
+      {% if has_permission(current_user,'moderate_reviews') and current_user.role == 'admin' %}
+      <a href="{{ url_for('admin.reviews') }}" class="{% if request.endpoint == 'admin.reviews' %}active{% endif %}">
+        <span class="nav-icon">⭐</span> Reviews Moderation
+      </a>
+      {% endif %}
+      {% if has_permission(current_user,'view_audit') and current_user.role == 'admin' %}
+      <a href="{{ url_for('admin.audit_log') }}" class="{% if request.endpoint == 'admin.audit_log' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Audit Log
+      </a>
+      {% endif %}
+      {% if current_user.role == 'admin' %}
+      <a href="{{ url_for('admin.catalog_settings') }}" class="{% if request.endpoint == 'admin.catalog_settings' %}active{% endif %}">
+        <span class="nav-icon">⚙️</span> Areas &amp; Options
+      </a>
+      {% endif %}
+
+      {% if current_user.role == 'super_admin' %}
+      <div class="nav-section-title">Super Admin</div>
+      <a href="{{ url_for('superadmin.users') }}" class="{% if request.endpoint == 'superadmin.users' %}active{% endif %}">
+        <span class="nav-icon">👥</span> Users
+      </a>
+      <a href="{{ url_for('superadmin.catalog_settings') }}" class="{% if request.endpoint == 'superadmin.catalog_settings' %}active{% endif %}">
+        <span class="nav-icon">⚙️</span> Areas &amp; Settings
+      </a>
+      <a href="{{ url_for('superadmin.commission_settings') }}" class="{% if request.endpoint == 'superadmin.commission_settings' %}active{% endif %}">
+        <span class="nav-icon">💰</span> Commission
+      </a>
+      <a href="{{ url_for('superadmin.admins') }}" class="{% if request.endpoint == 'superadmin.admins' %}active{% endif %}">
+        <span class="nav-icon">🛡️</span> Admins
+      </a>
+      <a href="{{ url_for('superadmin.audit_log') }}" class="{% if request.endpoint == 'superadmin.audit_log' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Audit Log
+      </a>
+      <a href="{{ url_for('superadmin.system_health') }}" class="{% if request.endpoint == 'superadmin.system_health' %}active{% endif %}">
+        <span class="nav-icon">💚</span> System Health
+      </a>
+      <a href="{{ url_for('superadmin.reviews') }}" class="{% if request.endpoint == 'superadmin.reviews' %}active{% endif %}">
+        <span class="nav-icon">⭐</span> Reviews
+      </a>
+      {% endif %}
+      {% endif %}
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">{{ current_user.email[0].upper() if current_user.email else (current_user.phone[0] if current_user.phone else 'U') }}</div>
+        <div>
+          <div class="user-name" style="max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            {{ current_user.email.split('@')[0] if current_user.email else (current_user.phone or 'User') }}
+          </div>
+          <div class="user-role">{{ current_user.role.replace('_',' ').title() }}</div>
+        </div>
+      </div>
+      <form action="{{ url_for('auth.logout') }}" method="post" style="margin-top:8px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-secondary" style="width:100%; justify-content:center; padding:7px; font-size:0.82rem; background:rgba(255,255,255,0.08); color:#c7d2fe; border:1px solid rgba(255,255,255,0.15);">
+          🚪 Log Out
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main Wrap -->
+  <div class="main-wrap">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">{% block page_title %}Dashboard{% endblock %}</span>
+      </div>
+      <div class="topbar-right" style="display:flex; align-items:center; gap:12px;">
+        <span class="badge {% if current_user.role == 'super_admin' %}badge-primary{% elif current_user.role == 'admin' %}badge-info{% elif current_user.role == 'tutor' %}badge-success{% else %}badge-warning{% endif %}" style="font-size:0.8rem; padding:4px 10px;">
+          Portal: {{ current_user.role|replace('_',' ')|upper }}
+        </span>
+        <span style="color:var(--text); font-size:0.85rem; font-weight:600;">
+          {{ current_user.email or current_user.phone or 'Active User' }}
+        </span>
+        <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline-block; margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-sm" style="padding: 5px 12px; font-size: 0.8rem; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;">
+            🚪 Log Out
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+  </div><!-- /main-wrap -->
+</div><!-- /layout -->
+
+{% else %}
+<!-- ══ PUBLIC PAGES — Home / Auth ══ -->
+{% block public_content %}
+<div class="home-layout">
+  <nav class="home-nav">
+    <a class="brand" href="{{ url_for('main.index') }}">Maria Tutor · <span>Burewala Marketplace</span></a>
+    <div class="home-nav-links" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <a href="{{ url_for('auth.parent_login') }}" style="display:flex; align-items:center; gap:4px; font-weight:600; color:#b45309;">
+        <span>👨‍👩‍👧</span> Parent Portal
+      </a>
+      <a href="{{ url_for('auth.tutor_login') }}" style="display:flex; align-items:center; gap:4px; font-weight:600; color:#15803d;">
+        <span>🎓</span> Tutor Portal
+      </a>
+      <a href="{{ url_for('auth.admin_login') }}" style="font-size:0.82rem; color:#64748b;">
+        🛡️ Staff
+      </a>
+      <a href="{{ url_for('auth.register_parent') }}" class="btn btn-sm" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">
+        Request a Tutor
+      </a>
+      <a href="{{ url_for('auth.register_tutor') }}" class="btn btn-sm btn-primary">
+        Join as Tutor
+      </a>
+    </div>
+  </nav>
+  <main style="min-height:80vh;padding:40px clamp(20px,5vw,80px);">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block inner_content %}{{ self.content() }}{% endblock %}
+  </main>
+  <footer class="home-footer">
+    <span>© 2026 Maria Tutor · Burewala Tutor Marketplace · Phase 1</span> &nbsp;·&nbsp;
+    <a href="{{ url_for('main.privacy') }}">Privacy &amp; Safety</a> &nbsp;·&nbsp;
+    <a href="{{ url_for('auth.admin_login') }}" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
+  </footer>
+</div>
+{% endblock %}
+{% endif %}
+
+</body>
+</html>

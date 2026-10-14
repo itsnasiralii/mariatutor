@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% block title %}Edit Tutor: {{ tutor.full_name }} — Admin Control{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding-bottom: 50px;">
+  
+  <div class="breadcrumb" style="margin-bottom: 12px; font-size: 0.85rem; color: var(--muted);">
+    <a href="{{ url_for('superadmin.users') if current_user.role == 'super_admin' else url_for('admin.tutors_list') }}" style="color: var(--primary); text-decoration: none;">Users &amp; Tutors</a> / 
+    <span>Edit Tutor Profile: {{ tutor.tutor_code }}</span>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800; margin: 0 0 6px 0; color: var(--text);">
+        ✏️ Edit Educator Profile: {{ tutor.full_name }}
+      </h1>
+      <p style="color: var(--muted); margin: 0; font-size: 0.92rem;">
+        Direct administrative control. Modify incorrect names, degrees, fees, subjects, or areas submitted by the teacher.
+      </p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('admin.tutor_detail', tutor_id=tutor.id) }}" class="btn btn-secondary" style="font-size: 0.85rem;">
+        👁️ View Verification Docs
+      </a>
+      <a href="{{ url_for('superadmin.users') if current_user.role == 'super_admin' else url_for('admin.tutors_list') }}" class="btn btn-outline" style="font-size: 0.85rem;">
+        ← Back to List
+      </a>
+    </div>
+  </div>
+
+  <form method="post" action="{{ url_for('admin.edit_tutor', tutor_id=tutor.id, next=request.args.get('next')) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- ══ CARD 1: PERSONAL & CONTACT INFORMATION ══ -->
+    <section class="panel" style="margin-bottom: 24px;">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        👤 1. Personal &amp; Contact Details
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Full Name (with Title) *</span>
+          <input type="text" name="full_name" value="{{ tutor.full_name }}" required maxlength="120" placeholder="e.g. Engr. Bilal Ahmad or Sir Usman">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Contact Phone *</span>
+          <input type="text" name="phone" value="{{ tutor.user.phone or '' }}" required maxlength="32" placeholder="e.g. 0300-1234567">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Email Address</span>
+          <input type="email" name="email" value="{{ tutor.user.email or '' }}" maxlength="254" placeholder="e.g. tutor@mariahome.com">
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Gender</span>
+          <select name="gender">
+            <option value="Male" {% if tutor.gender == 'Male' %}selected{% endif %}>Male</option>
+            <option value="Female" {% if tutor.gender == 'Female' %}selected{% endif %}>Female</option>
+            <option value="Other" {% if tutor.gender == 'Other' %}selected{% endif %}>Other</option>
+            <option value="Prefer not to say" {% if tutor.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <!-- ══ CARD 2: ACADEMIC CREDENTIALS & TEACHING BIO ══ -->
+    <section class="panel" style="margin-bottom: 24px;">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        🎓 2. Qualifications, Experience &amp; Daily Schedule
+      </h2>
+
+      <div style="margin-bottom: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Highest Degree / Qualification *</span>
+          <select id="qualification-select" name="qualification" onchange="toggleCustomDegree(this.value)">
+            <option value="">-- Select Standard Pakistani Degree --</option>
+            {% for item in choices['qualification'] %}
+              <option value="{{ item.name }}" {% if tutor.qualification == item.name %}selected{% endif %}>{{ item.name }}</option>
+            {% endfor %}
+            <option value="__other__" {% if tutor.qualification and tutor.qualification not in choices['qualification']|map(attribute='name') %}selected{% endif %}>+ Other Degree / Specify Manually...</option>
+          </select>
+        </label>
+        
+        <div id="custom-degree-wrap" style="margin-top: 10px; display: {% if tutor.qualification and tutor.qualification not in choices['qualification']|map(attribute='name') %}block{% else %}none{% endif %};">
+          <label>
+            <span style="font-weight: 600; font-size: 0.85rem; color: var(--primary);">Custom Degree Name</span>
+            <input type="text" id="custom-degree-input" name="qualification_custom" value="{% if tutor.qualification and tutor.qualification not in choices['qualification']|map(attribute='name') %}{{ tutor.qualification }}{% endif %}" placeholder="e.g. M.Sc Physics (Govt College Burewala) or BS AI">
+          </label>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Teaching Experience &amp; Achievements (Max 500 chars)</span>
+          <textarea name="experience" rows="3" maxlength="500" placeholder="e.g. 5 years teaching FSc Pre-Medical Physics at Aspire College Burewala. Guided students to achieve A+ grades in Sahiwal Board exams.">{{ tutor.experience or '' }}</textarea>
+        </label>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Preferred Daily Availability / Timings</span>
+          <select id="timing-select" name="availability" onchange="toggleCustomTiming(this.value)">
+            <option value="">-- Select Standard Availability Slot --</option>
+            {% for item in choices['timing'] %}
+              <option value="{{ item.name }}" {% if tutor.availability == item.name %}selected{% endif %}>{{ item.name }}</option>
+            {% endfor %}
+            <option value="__other__" {% if tutor.availability and tutor.availability not in choices['timing']|map(attribute='name') %}selected{% endif %}>+ Other Custom Timings...</option>
+          </select>
+        </label>
+        
+        <div id="custom-timing-wrap" style="margin-top: 10px; display: {% if tutor.availability and tutor.availability not in choices['timing']|map(attribute='name') %}block{% else %}none{% endif %};">
+          <label>
+            <span style="font-weight: 600; font-size: 0.85rem; color: var(--primary);">Custom Timing Description</span>
+            <input type="text" id="custom-timing-input" name="availability_custom" value="{% if tutor.availability and tutor.availability not in choices['timing']|map(attribute='name') %}{{ tutor.availability }}{% endif %}" placeholder="e.g. Daily 3:30 PM - 5:30 PM or Flexible evening hours">
+          </label>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Minimum Expected Fee (PKR/month)</span>
+          <input type="number" name="expected_fee_min" value="{{ tutor.expected_fee_min or '' }}" step="500" min="0" placeholder="e.g. 7000">
+        </label>
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Maximum Expected Fee (PKR/month)</span>
+          <input type="number" name="expected_fee_max" value="{{ tutor.expected_fee_max or '' }}" step="500" min="0" placeholder="e.g. 10000">
+        </label>
+      </div>
+    </section>
+
+    <!-- ══ CARD 3: BUREWALA TEACHING LOCATIONS ══ -->
+    <section class="panel" style="margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0;">
+          📍 3. Burewala Teaching Locations
+        </h2>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('area-chk', true)" style="font-size: 0.75rem;">Check All</button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('area-chk', false)" style="font-size: 0.75rem;">Clear All</button>
+        </div>
+      </div>
+      <p class="muted" style="font-size: 0.85rem; margin-bottom: 14px;">Select the areas where this tutor can physically travel for home tuitions.</p>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
+        {% set tutor_catalog_ids = tutor.catalog|map(attribute='id')|list %}
+        {% for area in choices['area'] %}
+        <label style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;">
+          <input type="checkbox" class="area-chk" name="catalog_ids" value="{{ area.id }}" {% if area.id in tutor_catalog_ids %}checked{% endif %}>
+          <span style="font-size: 0.88rem; font-weight: 500;">{{ area.name }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ══ CARD 4: SUBJECTS, CLASSES & MODES ══ -->
+    <section class="panel" style="margin-bottom: 24px;">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        📚 4. Academic Subjects, School Classes &amp; Modes
+      </h2>
+
+      <!-- Subjects -->
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-weight: 700; font-size: 0.95rem; color: #1e293b;">Teaching Subjects</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('subject-chk', true)" style="font-size: 0.75rem;">Check All</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('subject-chk', false)" style="font-size: 0.75rem;">Clear All</button>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
+          {% for sub in choices['subject'] %}
+          <label style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;">
+            <input type="checkbox" class="subject-chk" name="catalog_ids" value="{{ sub.id }}" {% if sub.id in tutor_catalog_ids %}checked{% endif %}>
+            <span style="font-size: 0.88rem; font-weight: 500;">{{ sub.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span style="font-weight: 700; font-size: 0.95rem; color: #1e293b;">Grade / School Classes</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('class-chk', true)" style="font-size: 0.75rem;">Check All</button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="toggleCategoryCheckboxes('class-chk', false)" style="font-size: 0.75rem;">Clear All</button>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px;">
+          {% for cls in choices['class'] %}
+          <label style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;">
+            <input type="checkbox" class="class-chk" name="catalog_ids" value="{{ cls.id }}" {% if cls.id in tutor_catalog_ids %}checked{% endif %}>
+            <span style="font-size: 0.88rem; font-weight: 500;">{{ cls.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Modes -->
+      <div>
+        <span style="font-weight: 700; font-size: 0.95rem; color: #1e293b; display: block; margin-bottom: 8px;">Teaching Modes</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          {% for mode in choices['mode'] %}
+          <label style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;">
+            <input type="checkbox" name="catalog_ids" value="{{ mode.id }}" {% if mode.id in tutor_catalog_ids %}checked{% endif %}>
+            <span style="font-size: 0.88rem; font-weight: 500;">{{ mode.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CARD 5: VERIFICATION STATUS, GOVERNANCE & ACCOUNT ══ -->
+    <section class="panel" style="margin-bottom: 30px; border-left: 4px solid var(--primary);">
+      <h2 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+        🛡️ 5. Administrative Status &amp; Account Control
+      </h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Verification Status *</span>
+          <select name="verification_status">
+            {% for s in ['Pending','Under Review','Manual review','Approved','Resubmission required','Rejected','Suspicious / restricted'] %}
+              <option value="{{ s }}" {% if tutor.verification_status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>
+          <span style="font-weight: 600; font-size: 0.88rem;">Account Login Status</span>
+          <select name="active">
+            <option value="1" {% if tutor.user.active %}selected{% endif %}>Active (Allowed to sign in)</option>
+            <option value="0" {% if not tutor.user.active %}selected{% endif %}>Disabled (Blocked from sign in)</option>
+          </select>
+        </label>
+
+        <label style="grid-column: 1 / -1;">
+          <span style="font-weight: 600; font-size: 0.88rem;">Internal Administrative Note (Private)</span>
+          <textarea name="verification_note" rows="2" maxlength="500" placeholder="Internal admin decision notes or verification findings...">{{ tutor.verification_note or '' }}</textarea>
+        </label>
+
+        <label style="grid-column: 1 / -1;">
+          <span style="font-weight: 600; font-size: 0.88rem;">Reset Password (Optional)</span>
+          <input type="password" name="new_password" placeholder="Leave blank to preserve current password. Enter new password (min 8 chars) to reset.">
+          <small class="muted" style="display: block; margin-top: 4px;">Only enter if you are helping the tutor reset their credentials.</small>
+        </label>
+      </div>
+    </section>
+
+    <!-- Form Actions -->
+    <div style="display: flex; gap: 12px; align-items: center; justify-content: flex-end; padding-top: 10px;">
+      <a href="{{ url_for('superadmin.users') if current_user.role == 'super_admin' else url_for('admin.tutor_detail', tutor_id=tutor.id) }}" class="btn btn-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.95rem; font-weight: 700;">
+        💾 Save Changes &amp; Update Profile
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+function toggleCustomDegree(val) {
+  var wrap = document.getElementById('custom-degree-wrap');
+  if (val === '__other__') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function toggleCustomTiming(val) {
+  var wrap = document.getElementById('custom-timing-wrap');
+  if (val === '__other__') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function toggleCategoryCheckboxes(className, checked) {
+  var boxes = document.querySelectorAll('.' + className);
+  boxes.forEach(function(box) {
+    box.checked = checked;
+  });
+}
+</script>
+{% endblock %}

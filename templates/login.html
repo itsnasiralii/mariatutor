@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block title %}
+  {% if portal == 'admin' %}Admin &amp; Staff Login — Burewala Tutor Marketplace
+  {% elif portal == 'tutor' %}Tutor Portal Login — Burewala Tutor Marketplace
+  {% elif portal == 'parent' %}Parent Portal Login — Burewala Tutor Marketplace
+  {% else %}Log in — Burewala Tutor Marketplace{% endif %}
+{% endblock %}
+
+{% block public_content %}
+<div class="auth-page">
+  <div class="auth-card" style="max-width: 480px;">
+
+    <!-- Portal Switch Tabs -->
+    <div style="display:flex; gap:6px; margin-bottom: 20px; background: var(--bg, #f1f5f9); padding: 4px; border-radius: 8px; font-size: 0.82rem;">
+      <a href="{{ url_for('auth.login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {% if not portal %}background:white; color:#0284c7; box-shadow:0 1px 3px rgba(0,0,0,0.1);{% else %}color:#64748b;{% endif %}">
+        🌐 All
+      </a>
+      <a href="{{ url_for('auth.tutor_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {% if portal == 'tutor' %}background:white; color:#059669; box-shadow:0 1px 3px rgba(0,0,0,0.1);{% else %}color:#64748b;{% endif %}">
+        🎓 Tutor
+      </a>
+      <a href="{{ url_for('auth.parent_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {% if portal == 'parent' %}background:white; color:#d97706; box-shadow:0 1px 3px rgba(0,0,0,0.1);{% else %}color:#64748b;{% endif %}">
+        👨‍👩‍👧 Parent
+      </a>
+      <a href="{{ url_for('auth.admin_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {% if portal == 'admin' %}background:white; color:#dc2626; box-shadow:0 1px 3px rgba(0,0,0,0.1);{% else %}color:#64748b;{% endif %}">
+        🛡️ Admin
+      </a>
+    </div>
+
+    <div class="auth-logo">
+      <div class="logo-icon">
+        {% if portal == 'admin' %}🛡️
+        {% elif portal == 'tutor' %}🎓
+        {% elif portal == 'parent' %}👨‍👩‍👧
+        {% else %}🎓{% endif %}
+      </div>
+      <h1>
+        {% if portal == 'admin' %}Admin &amp; Staff Portal
+        {% elif portal == 'tutor' %}Tutor Portal Login
+        {% elif portal == 'parent' %}Parent Portal Login
+        {% else %}Welcome Back{% endif %}
+      </h1>
+      <p>
+        {% if portal == 'admin' %}Burewala operations, lead matching &amp; governance
+        {% elif portal == 'tutor' %}Tuition opportunities in Burewala's 12 sectors
+        {% elif portal == 'parent' %}Submit &amp; track tuition requests for your children
+        {% else %}Log in to your Burewala Tutor Marketplace account{% endif %}
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="form-group">
+        <label for="identifier">
+          {% if portal == 'tutor' %}CNIC / Tutor ID / Email
+          {% elif portal == 'admin' %}Admin Email Address
+          {% elif portal == 'parent' %}Parent Email Address
+          {% else %}Username / Email / CNIC / Tutor ID{% endif %}
+        </label>
+        <input id="identifier" name="identifier" autocomplete="username" required
+               placeholder="{% if portal == 'tutor' %}36402-1234567-1 or T-BW001 or tutor@mariahome.com{% elif portal == 'admin' %}admin@mariahome.com or staff@mariahome.com{% elif portal == 'parent' %}parent@mariahome.com{% else %}XXXXX-XXXXXXX-X, ID, or email{% endif %}">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" autocomplete="current-password" required placeholder="Enter your password">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:0.95rem;">
+        {% if portal == 'admin' %}Log in to Admin Center →
+        {% elif portal == 'tutor' %}Log in to Tutor Portal →
+        {% elif portal == 'parent' %}Log in to Parent Portal →
+        {% else %}Log in →{% endif %}
+      </button>
+    </form>
+
+    <div class="auth-links" style="margin-top:16px;">
+      <a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+      &nbsp;·&nbsp;
+      <a href="{{ url_for('auth.register_parent') }}">Parent signup</a>
+      &nbsp;·&nbsp;
+      <a href="{{ url_for('auth.register_tutor') }}">Tutor signup</a>
+    </div>
+
+    <!-- Quick 1-Click Demo Logins for instant local testing -->
+    <div style="margin-top:24px; padding:14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px;">
+      <div style="font-size:0.78rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+        <span>⚡ 1-Click Demo Login</span>
+        <span style="font-size:0.72rem; color:#94a3b8; font-weight:normal;">Local Development</span>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+        <a href="{{ url_for('auth.quick_switch', role='super_admin') }}" class="btn btn-sm" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
+          👑 Super Admin
+        </a>
+        <a href="{{ url_for('auth.quick_switch', role='admin') }}" class="btn btn-sm" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
+          🛡️ Staff Admin
+        </a>
+        <a href="{{ url_for('auth.quick_switch', role='tutor') }}" class="btn btn-sm" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
+          🎓 Tutor (Usman)
+        </a>
+        <a href="{{ url_for('auth.quick_switch', role='parent') }}" class="btn btn-sm" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
+          👨‍👩‍👧 Parent (Tariq)
+        </a>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:14px;margin-bottom:0;">
+      🔒 Multi-tab testing tip: To use multiple accounts simultaneously, open an <strong>Incognito Window (Ctrl+Shift+N)</strong> or use Microsoft Edge / Firefox.
+    </p>
+  </div>
+</div>
+{% endblock %}
