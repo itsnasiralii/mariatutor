@@ -37,3 +37,7 @@ test_verify_fixes.py
 Thumbs.db
 .vscode/
 .idea/
+Back.jpg
+*.jpeg
+*.jpg
+

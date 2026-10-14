@@ -1,0 +1,72 @@
+<!-- Responsive Home / Public Navigation Bar -->
+<nav class="home-nav" id="homeNav">
+  <div class="home-nav-inner">
+    <!-- Brand -->
+    <a class="brand" href="{{ url_for('main.index') }}">
+      <span class="brand-icon">🎓</span>
+      <span class="brand-name">Maria Tutor <span class="brand-sub">· Burewala</span></span>
+    </a>
+
+    <!-- Hamburger Toggle for Mobile -->
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+      <span class="nav-toggle-icon" id="navToggleIcon">☰</span>
+    </button>
+
+    <!-- Nav Menu (Desktop row, Mobile collapsible dropdown) -->
+    <div class="home-nav-menu" id="homeNavMenu">
+      <div class="home-nav-links">
+        <a href="{{ url_for('main.parent_explore_tutors') }}" class="nav-link {% if request.endpoint == 'main.parent_explore_tutors' %}active{% endif %}">
+          <span class="nav-icon">🔍</span> Explore Tutors
+        </a>
+
+        {% if current_user.is_authenticated %}
+          {% if current_user.role in ['super_admin', 'admin'] %}
+          <a href="{{ url_for('superadmin.dashboard' if current_user.role == 'super_admin' else 'admin.dashboard') }}" class="nav-link nav-link-admin font-bold">
+            <span class="nav-icon">🏠</span> Admin Dashboard
+          </a>
+          {% elif current_user.role == 'tutor' %}
+          <a href="{{ url_for('main.tutor_dashboard') }}" class="nav-link nav-link-tutor font-bold">
+            <span class="nav-icon">🎓</span> Tutor Dashboard
+          </a>
+          {% elif current_user.role == 'parent' %}
+          <a href="{{ url_for('main.parent_dashboard') }}" class="nav-link nav-link-parent font-bold">
+            <span class="nav-icon">👨‍👩‍👧</span> Parent Dashboard
+          </a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('auth.parent_login') }}" class="nav-link nav-link-parent">
+            <span class="nav-icon">👨‍👩‍👧</span> Parent Portal
+          </a>
+          <a href="{{ url_for('auth.tutor_login') }}" class="nav-link nav-link-tutor">
+            <span class="nav-icon">🎓</span> Tutor Portal
+          </a>
+          <a href="{{ url_for('auth.admin_login') }}" class="nav-link nav-link-staff">
+            <span class="nav-icon">🛡️</span> Staff
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="home-nav-actions">
+        {% if current_user.is_authenticated %}
+          <span class="nav-user-pill">
+            👤 {{ current_user.email.split('@')[0] if current_user.email else (current_user.phone or current_user.role|title) }}
+          </span>
+          <form method="post" action="{{ url_for('auth.logout') }}" style="display:inline; margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-logout">
+              🚪 Log Out
+            </button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.register_parent') }}" class="btn btn-sm btn-request-nav">
+            Request a Tutor
+          </a>
+          <a href="{{ url_for('auth.register_tutor') }}" class="btn btn-sm btn-primary btn-join-nav">
+            Join as Tutor
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
