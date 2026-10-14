@@ -349,6 +349,7 @@ def seed_database(app=None):
             tutor_user = User(
                 identifier_hash=tutor_hash,
                 identifier_type="cnic",
+                cnic_hash=tutor_hash,
                 email=tutor_email,
                 phone="0301-9876543",
                 role="tutor",
@@ -360,6 +361,7 @@ def seed_database(app=None):
             print("Created Approved Senior Tutor: tutor@mariahome.com (CNIC: 36402-1234567-1, ID: T-BW001) / Tutor123")
         else:
             tutor_user.identifier_hash = tutor_hash
+            tutor_user.cnic_hash = tutor_hash
             tutor_user.email = tutor_email
             tutor_user.password_hash = make_password_hash(tutor_pass)
             tutor_user.active = True
@@ -416,6 +418,7 @@ def seed_database(app=None):
             ayesha_user = User(
                 identifier_hash=ayesha_hash,
                 identifier_type="cnic",
+                cnic_hash=ayesha_hash,
                 email=ayesha_email,
                 phone="0302-1234567",
                 role="tutor",
@@ -427,6 +430,7 @@ def seed_database(app=None):
             print(f"Created Approved Tutor: Miss Ayesha ({ayesha_code})")
         else:
             ayesha_user.identifier_hash = ayesha_hash
+            ayesha_user.cnic_hash = ayesha_hash
             ayesha_user.email = ayesha_email
             ayesha_user.password_hash = make_password_hash("Tutor123")
             ayesha_user.active = True
@@ -471,6 +475,7 @@ def seed_database(app=None):
             bilal_user = User(
                 identifier_hash=bilal_hash,
                 identifier_type="cnic",
+                cnic_hash=bilal_hash,
                 email=bilal_email,
                 phone="0303-7654321",
                 role="tutor",
@@ -482,6 +487,7 @@ def seed_database(app=None):
             print(f"Created Approved Tutor: Engr. Bilal ({bilal_code})")
         else:
             bilal_user.identifier_hash = bilal_hash
+            bilal_user.cnic_hash = bilal_hash
             bilal_user.email = bilal_email
             bilal_user.password_hash = make_password_hash("Tutor123")
             bilal_user.active = True
@@ -492,15 +498,22 @@ def seed_database(app=None):
                 bilal_user.tutor.approved_at = datetime.now(timezone.utc)
                 bilal_user.tutor.catalog = bilal_catalog
     
-        # 8d. Demo Parent (parent@mariahome.com / Parent123)
+        # 8d. Demo Parent (parent@mariahome.com / CNIC: 36402-7654321-1 / Parent123)
         parent_email = "parent@mariahome.com"
+        parent_cnic = "36402-7654321-1"
         parent_pass = "Parent123"
-        parent_hash = identifier_hash(parent_email, "email")
-        parent_user = User.query.filter_by(email=parent_email).first() or User.query.filter_by(identifier_hash=parent_hash).first()
+        parent_cnic_hash = identifier_hash(parent_cnic, "cnic")
+        parent_email_hash = identifier_hash(parent_email, "email")
+        parent_user = (
+            User.query.filter_by(email=parent_email).first()
+            or User.query.filter_by(identifier_hash=parent_cnic_hash).first()
+            or User.query.filter_by(identifier_hash=parent_email_hash).first()
+        )
         if not parent_user:
             parent_user = User(
-                identifier_hash=parent_hash,
-                identifier_type="email",
+                identifier_hash=parent_cnic_hash,
+                identifier_type="cnic",
+                cnic_hash=parent_cnic_hash,
                 email=parent_email,
                 phone="0300-7654321",
                 role="parent",
@@ -509,9 +522,11 @@ def seed_database(app=None):
                 parent=ParentProfile(full_name="Chaudhry Tariq (Parent)"),
             )
             db.session.add(parent_user)
-            print("Created Demo Parent: parent@mariahome.com / Parent123")
+            print("Created Demo Parent: parent@mariahome.com / CNIC: 36402-7654321-1 / Parent123")
         else:
-            parent_user.identifier_hash = parent_hash
+            parent_user.identifier_hash = parent_cnic_hash
+            parent_user.identifier_type = "cnic"
+            parent_user.cnic_hash = parent_cnic_hash
             parent_user.email = parent_email
             parent_user.password_hash = make_password_hash(parent_pass)
             parent_user.active = True

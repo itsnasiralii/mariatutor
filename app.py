@@ -20,6 +20,8 @@ def create_app(test_config=None):
     login_manager.login_message = "Please sign in to access this page."
     migrate.init_app(app, db)
     limiter.init_app(app)
+    if app.config.get("TESTING", False) or not app.config.get("RATELIMIT_ENABLED", True):
+        limiter.enabled = False
 
     from auth import bp as auth_bp
     from routes import bp as main_bp
@@ -199,6 +201,12 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(db.text("ALTER TABLE user ADD COLUMN cnic_hash VARCHAR(64)"))
+                conn.commit()
+        except Exception:
+            pass
         # Auto-seed Burewala catalogs, areas, subjects, and admin if database is fresh
         from models import CatalogItem
         if not CatalogItem.query.first():

@@ -877,24 +877,32 @@ document.addEventListener('DOMContentLoaded', function() {
   // Pakistani CNIC automatic hyphen formatting & gender detection
   if (cnicInput) {
     cnicInput.addEventListener('input', function(e) {
-      let val = cnicInput.value.replace(/\D/g, ''); // digits only
-      if (val.length > 13) val = val.slice(0, 13);
-
-      let formatted = '';
-      if (val.length > 0) {
-        formatted = val.slice(0, 5);
-        if (val.length > 5) {
-          formatted += '-' + val.slice(5, 12);
-          if (val.length > 12) {
-            formatted += '-' + val.slice(12, 13);
-          }
-        }
+      let digits = cnicInput.value.replace(/\D/g, '').slice(0, 13);
+      if (!digits) {
+        if (cnicInput.value.trim() === '') cnicInput.value = '';
+        if (cnicBadge) cnicBadge.style.display = 'none';
+        return;
       }
+
+      let formatted = digits.slice(0, 5);
+      if (digits.length > 5) {
+        formatted += '-' + digits.slice(5, 12);
+        if (digits.length > 12) {
+          formatted += '-' + digits.slice(12, 13);
+        }
+      } else if (digits.length === 5 && e.inputType !== 'deleteContentBackward') {
+        formatted += '-';
+      }
+
+      if (digits.length === 12 && e.inputType !== 'deleteContentBackward') {
+        formatted += '-';
+      }
+
       cnicInput.value = formatted;
 
       // When 13 digits are complete:
-      if (val.length === 13) {
-        const lastDigit = parseInt(val.slice(-1), 10);
+      if (digits.length === 13) {
+        const lastDigit = parseInt(digits.slice(-1), 10);
         const detectedGender = (lastDigit % 2 === 1) ? 'Male' : 'Female';
         
         if (genderSelect && genderSelect.value === 'Prefer not to say') {

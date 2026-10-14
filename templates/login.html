@@ -64,11 +64,16 @@
         <label for="identifier">
           {% if portal == 'tutor' %}CNIC / Tutor ID / Email
           {% elif portal == 'admin' %}Admin Email Address
-          {% elif portal == 'parent' %}Parent Email Address
-          {% else %}Username / Email / CNIC / Tutor ID{% endif %}
+          {% elif portal == 'parent' %}Parent CNIC / Email Address
+          {% else %}CNIC / Email / Tutor ID{% endif %}
         </label>
         <input id="identifier" name="identifier" autocomplete="username" required
-               placeholder="{% if portal == 'tutor' %}36402-1234567-1 or T-BW001 or tutor@mariahome.com{% elif portal == 'admin' %}admin@mariahome.com or staff@mariahome.com{% elif portal == 'parent' %}parent@mariahome.com{% else %}XXXXX-XXXXXXX-X, ID, or email{% endif %}">
+               placeholder="{% if portal == 'tutor' %}36402-1234567-1 or T-BW001 or tutor@mariahome.com{% elif portal == 'admin' %}admin@mariahome.com or staff@mariahome.com{% elif portal == 'parent' %}36402-7654321-1 or parent@mariahome.com{% else %}36402-XXXXXXX-X, ID, or email{% endif %}">
+        {% if portal != 'admin' %}
+        <small id="cnic-login-hint" style="display:block; color:var(--muted, #64748b); font-size:0.75rem; margin-top:4px;">
+          Enter 13-digit Pakistani CNIC (dashes are added automatically) or email address.
+        </small>
+        {% endif %}
       </div>
 
       <div class="form-group">
@@ -119,4 +124,41 @@
     </p>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('identifier');
+  if (!input) return;
+
+  input.addEventListener('input', function(e) {
+    let val = input.value;
+    if (/[@a-zA-Z]/.test(val) && !val.toUpperCase().startsWith('T-')) {
+      if (/[a-zA-Z]/.test(val)) return;
+    }
+    if (val.toUpperCase().startsWith('T-') || val.toUpperCase().startsWith('T')) return;
+
+    let digits = val.replace(/\D/g, '').slice(0, 13);
+    if (!digits) {
+      if (val.trim() === '') input.value = '';
+      return;
+    }
+
+    let formatted = digits.slice(0, 5);
+    if (digits.length > 5) {
+      formatted += '-' + digits.slice(5, 12);
+      if (digits.length > 12) {
+        formatted += '-' + digits.slice(12, 13);
+      }
+    } else if (digits.length === 5 && e.inputType !== 'deleteContentBackward') {
+      formatted += '-';
+    }
+
+    if (digits.length === 12 && e.inputType !== 'deleteContentBackward') {
+      formatted += '-';
+    }
+
+    input.value = formatted;
+  });
+});
+</script>
 {% endblock %}

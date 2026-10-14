@@ -23,7 +23,7 @@ from models import (
     SystemSetting,
 )
 
-CNIC_RE = re.compile(r"^\d{5}-\d{7}-\d$")
+CNIC_RE = re.compile(r"^\d{5}[-/]\d{7}[-/]\d$")
 PASSWORD_RE = re.compile(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$")
 ADMIN_PERMISSIONS = {
     "view_requests",
@@ -117,9 +117,22 @@ def now():
     return datetime.now(timezone.utc)
 
 
+def normalize_cnic(value: str) -> str:
+    """Normalize any Pakistani CNIC string (with hyphens, slashes, or raw 13 digits) to standard XXXXX-XXXXXXX-X."""
+    if not value:
+        return ""
+    digits = re.sub(r"\D", "", str(value))
+    if len(digits) == 13:
+        return f"{digits[:5]}-{digits[5:12]}-{digits[12]}"
+    return str(value).strip()
+
+
 def normalized_identifier(value: str, kind: str) -> str:
     value = (value or "").strip()
     if kind == "cnic":
+        digits = re.sub(r"\D", "", value)
+        if len(digits) == 13:
+            return f"{digits[:5]}-{digits[5:12]}-{digits[12]}"
         return value.replace(" ", "")
     if kind == "email":
         return value.lower()

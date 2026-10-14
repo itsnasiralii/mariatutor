@@ -12,6 +12,7 @@ from services import (
     create_tutor_code,
     identifier_hash,
     make_password_hash,
+    normalize_cnic,
     password_ok,
     verify_password,
 )
@@ -44,7 +45,8 @@ def register_tutor():
 
     if request.method == "POST":
         name = request.form.get("full_name", "").strip()
-        cnic = request.form.get("cnic", "").strip()
+        cnic_raw = request.form.get("cnic", "").strip()
+        cnic = normalize_cnic(cnic_raw)
         phone = request.form.get("phone", "").strip()
         email = request.form.get("email", "").strip().lower() or None
         password = request.form.get("password", "")
@@ -62,7 +64,7 @@ def register_tutor():
             flash("Password must be at least 8 characters long and include uppercase, lowercase, and numeric characters.", "error")
         else:
             digest = identifier_hash(cnic, "cnic")
-            if User.query.filter_by(identifier_hash=digest).first():
+            if User.query.filter((User.identifier_hash == digest) | (User.cnic_hash == digest)).first():
                 flash("An account with this CNIC already exists. Please log in or reset your password.", "error")
             else:
                 selected_ids = {int(x) for x in request.form.getlist("catalog_ids") if x.isdigit()}
@@ -112,6 +114,7 @@ def register_tutor():
                 user = User(
                     identifier_hash=digest,
                     identifier_type="cnic",
+                    cnic_hash=digest,
                     email=email,
                     phone=phone,
                     role="tutor",
@@ -138,19 +141,49 @@ def register_parent():
         return redirect(url_for("main.dashboard"))
     if request.method == "POST":
         name = request.form.get("full_name", "").strip()
-        email = request.form.get("email", "").strip().lower()
+        cnic_raw = request.form.get("cnic", "").strip()
+        cnic = normalize_cnic(cnic_raw)
+        email = request.form.get("email", "").strip().lower() or None
         phone = request.form.get("phone", "").strip()
         password = request.form.get("password", "")
-        if not name or not email or "@" not in email or len(email) > 254 or not phone or len(phone) > 32:
-            flash("Please provide your full name, valid email address, and contact phone number.", "error")
+
+        if not name:
+            flash("Please provide your full name.", "error")
+        elif not phone or len(phone) > 32:
+            flash("Contact phone number is required.", "error")
+        elif cnic_raw and not CNIC_RE.fullmatch(cnic):
+            flash("Please enter a valid Pakistani CNIC (13 digits, e.g. 36402-XXXXXXX-X).", "error")
+        elif not cnic and not email:
+            flash("Please provide your CNIC number or email address for account login.", "error")
+        elif email and ("@" not in email or len(email) > 254):
+            flash("Please provide a valid email address.", "error")
         elif not password_ok(password):
             flash("Password must be at least 8 characters long and include uppercase, lowercase, and numeric characters.", "error")
-        elif User.query.filter_by(identifier_hash=identifier_hash(email, "email")).first():
-            flash("An account with this email address already exists. Please log in or reset password.", "error")
         else:
+            cnic_digest = identifier_hash(cnic, "cnic") if cnic else None
+            email_digest = identifier_hash(email, "email") if email else None
+
+            # Check if CNIC already registered
+            if cnic_digest and User.query.filter(
+                (User.identifier_hash == cnic_digest) | (User.cnic_hash == cnic_digest)
+            ).first():
+                flash("An account with this CNIC already exists. Please log in.", "error")
+                return render_template("register_parent.html"), 400
+
+            # Check if Email already registered
+            if email and User.query.filter(
+                (User.identifier_hash == email_digest) | (db.func.lower(User.email) == email.lower())
+            ).first():
+                flash("An account with this email address already exists. Please log in or reset password.", "error")
+                return render_template("register_parent.html"), 400
+
+            primary_hash = cnic_digest if cnic_digest else email_digest
+            primary_type = "cnic" if cnic_digest else "email"
+
             user = User(
-                identifier_hash=identifier_hash(email, "email"),
-                identifier_type="email",
+                identifier_hash=primary_hash,
+                identifier_type=primary_type,
+                cnic_hash=cnic_digest,
                 email=email,
                 phone=phone,
                 role="parent",
@@ -171,16 +204,38 @@ def _find_user_by_identifier(identifier: str):
     identifier = (identifier or "").strip()
     if not identifier:
         return None
-    kind = "cnic" if CNIC_RE.fullmatch(identifier) else "email"
-    user = User.query.filter_by(identifier_hash=identifier_hash(identifier, kind)).first()
-    if not user and "@" in identifier:
-        user = User.query.filter(db.func.lower(User.email) == identifier.lower()).first()
-    if not user and identifier.upper().startswith("T-"):
+
+    # 1. Normalize and check if CNIC (supports dashes, slashes, or 13 raw digits)
+    norm_cnic = normalize_cnic(identifier)
+    if CNIC_RE.fullmatch(norm_cnic):
+        chash = identifier_hash(norm_cnic, "cnic")
+        user = User.query.filter(
+            (User.identifier_hash == chash) | (User.cnic_hash == chash)
+        ).first()
+        if user:
+            return user
+
+    # 2. Check if Email
+    if "@" in identifier:
+        ehash = identifier_hash(identifier.lower(), "email")
+        user = User.query.filter(
+            (User.identifier_hash == ehash) | (db.func.lower(User.email) == identifier.lower())
+        ).first()
+        if user:
+            return user
+
+    # 3. Check if Tutor Code
+    if identifier.upper().startswith("T-"):
         tutor_prof = TutorProfile.query.filter(
             db.func.upper(TutorProfile.tutor_code) == identifier.upper()
         ).first()
         if tutor_prof:
-            user = tutor_prof.user
+            return tutor_prof.user
+
+    # 4. Fallback lookup by generic identifier_hash
+    user = User.query.filter_by(identifier_hash=identifier_hash(identifier, "cnic")).first()
+    if not user:
+        user = User.query.filter_by(identifier_hash=identifier_hash(identifier, "email")).first()
     return user
 
 

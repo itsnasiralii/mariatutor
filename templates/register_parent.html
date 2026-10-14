@@ -45,12 +45,24 @@
         </div>
 
         <div>
-          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
-            Email Address (Login Username) *
+          <label for="parent-cnic-input" style="display:flex; justify-content:space-between; align-items:center; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            <span>Pakistani CNIC Number (for Direct CNIC Login) *</span>
+            <span id="parent-cnic-badge" style="display:none; font-size:0.75rem; padding:2px 8px; border-radius:99px; background:#dcfce7; color:#15803d; font-weight:700;"></span>
           </label>
-          <input type="email" name="email" required autocomplete="email" placeholder="parent@example.com"
+          <input id="parent-cnic-input" name="cnic" required maxlength="15" autocomplete="username" placeholder="36402-XXXXXXX-X"
                  style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
-          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Used to track tutor matching status and receive demo schedules.</small>
+          <small id="parent-cnic-hint" style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">
+            13 digits with hyphens (e.g. 36402-7654321-1). Dashes are added automatically as you type.
+          </small>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:0.88rem; font-weight:600; color:#334155; margin-bottom:6px;">
+            Email Address (Optional / Alternate Login)
+          </label>
+          <input type="email" name="email" autocomplete="email" placeholder="parent@example.com"
+                 style="width:100%; padding:11px 14px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.92rem;">
+          <small style="color:#64748b; font-size:0.78rem; margin-top:4px; display:block;">Used for email notifications, matching updates, and password recovery.</small>
         </div>
 
         <div>
@@ -95,4 +107,54 @@
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const cnicInput = document.getElementById('parent-cnic-input');
+  const badge = document.getElementById('parent-cnic-badge');
+  const hint = document.getElementById('parent-cnic-hint');
+  if (!cnicInput) return;
+
+  cnicInput.addEventListener('input', function(e) {
+    let digits = cnicInput.value.replace(/\D/g, '').slice(0, 13);
+    if (!digits) {
+      if (cnicInput.value.trim() === '') cnicInput.value = '';
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    let formatted = digits.slice(0, 5);
+    if (digits.length > 5) {
+      formatted += '-' + digits.slice(5, 12);
+      if (digits.length > 12) {
+        formatted += '-' + digits.slice(12, 13);
+      }
+    } else if (digits.length === 5 && e.inputType !== 'deleteContentBackward') {
+      formatted += '-';
+    }
+
+    if (digits.length === 12 && e.inputType !== 'deleteContentBackward') {
+      formatted += '-';
+    }
+
+    cnicInput.value = formatted;
+
+    if (digits.length === 13) {
+      if (badge) {
+        badge.style.display = 'inline-block';
+        badge.textContent = '✓ 13-digit CNIC ready';
+      }
+      if (hint) {
+        hint.innerHTML = '<span style="color:#15803d; font-weight:600;">✓ Valid Pakistani CNIC format.</span> You can use this CNIC to log in.';
+      }
+    } else {
+      if (badge) badge.style.display = 'none';
+      if (hint) {
+        hint.style.color = '#64748b';
+        hint.textContent = '13 digits with hyphens (e.g. 36402-7654321-1). Dashes are added automatically as you type.';
+      }
+    }
+  });
+});
+</script>
 {% endblock %}

@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     identifier_hash = db.Column(db.String(64), unique=True, nullable=False, index=True)
     identifier_type = db.Column(db.String(20), nullable=False)
+    cnic_hash = db.Column(db.String(64), nullable=True, index=True)
     email = db.Column(db.String(254), nullable=True, index=True)
     phone = db.Column(db.String(32), nullable=True)
     role = db.Column(db.String(24), nullable=False, index=True)
