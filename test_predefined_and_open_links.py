@@ -65,5 +65,10 @@ class PredefinedAndOpenLinksTestCase(unittest.TestCase):
         self.assertIn("Staff / Admin", html)
         self.assertIn("Open Website", html)
 
+        # Check top navigation links specifically
+        self.assertIn('href="/parent/login" target="_blank" class="nav-link nav-link-parent"', html)
+        self.assertIn('href="/tutor/login" target="_blank" class="nav-link nav-link-tutor"', html)
+        self.assertIn('href="/admin/login" target="_blank" class="nav-link nav-link-staff"', html)
+
 if __name__ == '__main__':
     unittest.main()

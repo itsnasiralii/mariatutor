@@ -24,26 +24,26 @@
 
         {% if current_user.is_authenticated %}
           {% if current_user.role in ['super_admin', 'admin'] %}
-          <a href="{{ url_for('superadmin.dashboard' if current_user.role == 'super_admin' else 'admin.dashboard') }}" class="nav-link nav-link-admin font-bold">
+          <a href="{{ url_for('superadmin.dashboard' if current_user.role == 'super_admin' else 'admin.dashboard') }}" target="_blank" class="nav-link nav-link-admin font-bold">
             <span class="nav-icon">🏠</span> Admin Dashboard
           </a>
           {% elif current_user.role == 'tutor' %}
-          <a href="{{ url_for('main.tutor_dashboard') }}" class="nav-link nav-link-tutor font-bold">
+          <a href="{{ url_for('main.tutor_dashboard') }}" target="_blank" class="nav-link nav-link-tutor font-bold">
             <span class="nav-icon">🎓</span> Tutor Dashboard
           </a>
           {% elif current_user.role == 'parent' %}
-          <a href="{{ url_for('main.parent_dashboard') }}" class="nav-link nav-link-parent font-bold">
+          <a href="{{ url_for('main.parent_dashboard') }}" target="_blank" class="nav-link nav-link-parent font-bold">
             <span class="nav-icon">👨‍👩‍👧</span> Parent Dashboard
           </a>
           {% endif %}
         {% else %}
-          <a href="{{ url_for('auth.parent_login') }}" class="nav-link nav-link-parent">
+          <a href="{{ url_for('auth.parent_login') }}" target="_blank" class="nav-link nav-link-parent">
             <span class="nav-icon">👨‍👩‍👧</span> Parent Portal
           </a>
-          <a href="{{ url_for('auth.tutor_login') }}" class="nav-link nav-link-tutor">
+          <a href="{{ url_for('auth.tutor_login') }}" target="_blank" class="nav-link nav-link-tutor">
             <span class="nav-icon">🎓</span> Tutor Portal
           </a>
-          <a href="{{ url_for('auth.admin_login') }}" class="nav-link nav-link-staff">
+          <a href="{{ url_for('auth.admin_login') }}" target="_blank" class="nav-link nav-link-staff">
             <span class="nav-icon">🛡️</span> Staff
           </a>
         {% endif %}
