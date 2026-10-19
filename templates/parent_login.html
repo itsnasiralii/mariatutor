@@ -5,6 +5,16 @@
 <div class="auth-page" style="min-height: 85vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 20%, #7c2d12 0%, #431407 100%);">
   <div class="auth-card" style="max-width: 440px; width: 100%; border: 1.5px solid #9a3412; background: #7c2d12; color: #fff7ed; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-radius: 16px; padding: 36px 30px;">
 
+    <!-- Top Back Link & Portal Badge -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid rgba(254, 215, 170, 0.15);">
+      <a href="{{ url_for('main.index') }}" style="color: #ffedd5; font-size: 0.84rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        🏠 ← Back to Website
+      </a>
+      <span style="font-size: 0.72rem; color: #fdba74; font-weight: 700; background: rgba(249, 115, 22, 0.2); padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">
+        Parent Portal
+      </span>
+    </div>
+
     <!-- Parent Badge & Header -->
     <div style="text-align: center; margin-bottom: 26px;">
       <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(249, 115, 22, 0.2); border: 1.5px solid #f97316; color: #fdba74; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 14px;">
@@ -62,9 +72,10 @@
       </a>
     </div>
 
-    <div style="margin-top: 24px; text-align: center;">
-      <a href="{{ url_for('main.index') }}" style="color: #fed7aa; font-size: 0.85rem; text-decoration: none;">
-        ← Back to Public Website
+    <div style="margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(254, 215, 170, 0.2); text-align: center;">
+      <a href="{{ url_for('main.index') }}" class="back-public-btn" style="background: rgba(255, 255, 255, 0.09); color: #ffffff; border: 1.5px solid rgba(254, 215, 170, 0.45);">
+        <span style="font-size: 1.1rem;">🏠</span>
+        <span>← Back to Public Website</span>
       </a>
     </div>
 
