@@ -56,14 +56,13 @@ class PredefinedAndOpenLinksTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         html = res.data.decode('utf-8')
 
-        # Check Open Website and portals in new window
-        self.assertIn("Open Website Portals in New Window", html)
-        self.assertIn("target=\"_blank\"", html)
-        self.assertIn("Request a Tutor", html)
-        self.assertIn("Parent Portal", html)
-        self.assertIn("Tutor Portal", html)
-        self.assertIn("Staff / Admin", html)
-        self.assertIn("Open Website", html)
+        # Direct access box should be removed from homepage body
+        self.assertNotIn("Open Website Portals in New Window", html)
+        self.assertNotIn("Live Portals &amp; Direct Access", html)
+
+        # Check Home button in top navbar
+        self.assertIn('href="/" class="nav-link active"', html)
+        self.assertIn("Home", html)
 
         # Check top navigation links specifically
         self.assertIn('href="/parent/login" target="_blank" class="nav-link nav-link-parent"', html)

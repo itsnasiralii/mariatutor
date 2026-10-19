@@ -15,6 +15,9 @@
     <!-- Nav Menu (Desktop row, Mobile collapsible dropdown) -->
     <div class="home-nav-menu" id="homeNavMenu">
       <div class="home-nav-links">
+        <a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">
+          <span class="nav-icon">🏠</span> Home
+        </a>
         <a href="{{ url_for('main.parent_explore_tutors') }}" class="nav-link {% if request.endpoint == 'main.parent_explore_tutors' %}active{% endif %}">
           <span class="nav-icon">🔍</span> Explore Tutors
         </a>
