@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Safeguarding, Child Protection &amp; Code of Conduct — Maria Tutor Burewala{% endblock %}
+{% block page_title %}Safeguarding &amp; Code of Conduct Contract{% endblock %}
+
+{% block content %}
+<div class="contract-container">
+  {% include 'contract_body.html' %}
+</div>
+{% endblock %}
+
+{% block public_content %}
+<div class="home-layout">
+  {% include 'nav_home.html' %}
+  <main style="min-height:80vh; padding: 24px clamp(14px, 4vw, 50px); background: #f8fafc;">
+    <div class="contract-container" style="max-width: 1040px; margin: 0 auto;">
+      {% include 'contract_body.html' %}
+    </div>
+  </main>
+</div>
+{% endblock %}

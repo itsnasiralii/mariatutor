@@ -1,3 +1,4 @@
+import html as html_lib
 import unittest
 from app import create_app
 from extensions import db
@@ -34,7 +35,7 @@ class AdminCrudTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         html = res.data.decode('utf-8')
         self.assertIn("Edit Educator Profile", html)
-        self.assertIn(orig_name, html)
+        self.assertTrue(orig_name in html or html_lib.escape(orig_name) in html)
 
         # POST update
         post_data = {

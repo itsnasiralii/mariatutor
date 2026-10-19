@@ -65,6 +65,9 @@
       <a href="{{ url_for('main.tutor_documents') }}" class="{% if request.endpoint == 'main.tutor_documents' %}active{% endif %}">
         <span class="nav-icon">📄</span> Identity Documents
       </a>
+      <a href="{{ url_for('main.contract') }}" class="{% if request.endpoint == 'main.contract' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Code of Conduct &amp; Contract
+      </a>
       {% endif %}
 
       <!-- Parent Links -->
@@ -78,6 +81,9 @@
       </a>
       <a href="{{ url_for('main.parent_explore_tutors') }}" class="{% if request.endpoint == 'main.parent_explore_tutors' %}active{% endif %}">
         <span class="nav-icon">🔍</span> Explore Areas &amp; Tutors
+      </a>
+      <a href="{{ url_for('main.contract') }}" class="{% if request.endpoint == 'main.contract' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Tuition Agreement &amp; Rules
       </a>
       {% endif %}
 
@@ -108,6 +114,9 @@
       <a href="{{ url_for('admin.catalog_settings') }}" class="{% if request.endpoint == 'admin.catalog_settings' %}active{% endif %}">
         <span class="nav-icon">⚙️</span> Areas &amp; Options
       </a>
+      <a href="{{ url_for('main.contract') }}" class="{% if request.endpoint == 'main.contract' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Safeguarding &amp; Contract
+      </a>
       {% endif %}
 
       {% if current_user.role == 'super_admin' %}
@@ -132,6 +141,9 @@
       </a>
       <a href="{{ url_for('superadmin.reviews') }}" class="{% if request.endpoint == 'superadmin.reviews' %}active{% endif %}">
         <span class="nav-icon">⭐</span> Reviews
+      </a>
+      <a href="{{ url_for('main.contract') }}" class="{% if request.endpoint == 'main.contract' %}active{% endif %}">
+        <span class="nav-icon">📜</span> Safeguarding &amp; Contract
       </a>
       {% endif %}
       {% endif %}

@@ -8,6 +8,7 @@ from sqlalchemy import text
 from werkzeug.utils import secure_filename
 from extensions import db, limiter
 from models import (
+    AuditEvent,
     CatalogItem,
     LeadEvent,
     OpportunityExposure,
@@ -515,3 +516,46 @@ def _positive_int(value):
         return max(0, n)
     except (ValueError, TypeError):
         return None
+
+
+@bp.route("/contract", methods=["GET", "POST"])
+def contract():
+    signed_event = None
+    if current_user.is_authenticated:
+        signed_event = AuditEvent.query.filter_by(
+            actor_id=current_user.id,
+            action="contract_accepted",
+        ).order_by(AuditEvent.created_at.desc()).first()
+
+        if request.method == "POST":
+            action = request.form.get("action")
+            if action == "accept" and not signed_event:
+                name_display = current_user.email or current_user.phone or f"User-{current_user.id}"
+                if current_user.role == "tutor" and current_user.tutor:
+                    name_display = f"{current_user.tutor.full_name} ({current_user.tutor.tutor_code})"
+                elif current_user.role == "parent" and current_user.parent:
+                    name_display = current_user.parent.full_name
+
+                audit(
+                    "contract_accepted",
+                    "contract",
+                    str(current_user.id),
+                    f"{current_user.role.title()} '{name_display}' digitally accepted and signed Safeguarding & Code of Conduct Contract",
+                    actor=current_user,
+                )
+                db.session.commit()
+                flash("You have successfully signed and accepted the Maria Tutor Safeguarding & Code of Conduct Agreement.", "success")
+                return redirect(url_for("main.contract"))
+
+    return render_template("contract.html", signed_event=signed_event)
+
+
+@bp.route("/tutor/contract")
+def tutor_contract():
+    return redirect(url_for("main.contract"))
+
+
+@bp.route("/parent/contract")
+def parent_contract():
+    return redirect(url_for("main.contract"))
+
