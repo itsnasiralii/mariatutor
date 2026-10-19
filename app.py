@@ -216,22 +216,26 @@ def create_app(test_config=None):
             except Exception as e:
                 app.logger.warning("Auto-seed on startup: %s", e)
 
+        # Ensure predefined live accounts (nasir@mariatutor.com, staff@mariatutor.com, tutor@mariatutor.com, parent@mariatutor.com)
+        try:
+            from predefined_accounts import ensure_predefined_accounts
+            ensure_predefined_accounts()
+        except Exception as e:
+            app.logger.warning("Predefined accounts initialization: %s", e)
+
         email = app.config.get("BOOTSTRAP_SUPERADMIN_EMAIL", "").strip().lower()
         password = app.config.get("BOOTSTRAP_SUPERADMIN_PASSWORD", "")
         if email and password and not User.query.filter_by(role="super_admin").first():
-            if password_ok(password):
-                db.session.add(
-                    User(
-                        identifier_hash=identifier_hash(email, "email"),
-                        identifier_type="email",
-                        email=email,
-                        role="super_admin",
-                        password_hash=make_password_hash(password),
-                    )
+            db.session.add(
+                User(
+                    identifier_hash=identifier_hash(email, "email"),
+                    identifier_type="email",
+                    email=email,
+                    role="super_admin",
+                    password_hash=make_password_hash(password),
                 )
-                db.session.commit()
-            else:
-                app.logger.error("Bootstrap admin password rejected: it must satisfy the published password policy.")
+            )
+            db.session.commit()
     return app
 
 

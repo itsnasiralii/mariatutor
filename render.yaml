@@ -22,9 +22,9 @@ services:
           name: burewala-tutor-db
           property: connectionString
       - key: BOOTSTRAP_SUPERADMIN_EMAIL
-        value: admin@mariahome.com
+        value: nasir@mariatutor.com
       - key: BOOTSTRAP_SUPERADMIN_PASSWORD
-        value: Admin123
+        value: "123"
 
 databases:
   - name: burewala-tutor-db

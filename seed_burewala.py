@@ -532,6 +532,10 @@ def seed_database(app=None):
             parent_user.active = True
             if not parent_user.parent:
                 parent_user.parent = ParentProfile(full_name="Chaudhry Tariq (Parent)")
+
+        # 9. Predefined Live Production Accounts
+        from predefined_accounts import ensure_predefined_accounts
+        ensure_predefined_accounts()
     
         db.session.commit()
         print("Seeding completed successfully!")

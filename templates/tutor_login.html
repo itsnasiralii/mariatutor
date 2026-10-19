@@ -34,7 +34,7 @@
           CNIC / Tutor ID / Email Address
         </label>
         <input id="identifier" name="identifier" autocomplete="username" required
-               placeholder="36402-1234567-1, T-BW001, or tutor@mariahome.com"
+               placeholder="36402-1234567-1, T-BW001, or tutor@mariatutor.com"
                style="width: 100%; padding: 12px 14px; background: #022c22; border: 1.5px solid #047857; border-radius: 8px; color: #fff; font-size: 0.92rem;">
         <small id="cnic-tutor-hint" style="display:block; color:#a7f3d0; font-size:0.75rem; margin-top:4px;">
           Enter 13-digit Pakistani CNIC (dashes are added automatically), Tutor ID, or Email.
@@ -62,24 +62,7 @@
       </a>
     </div>
 
-    <!-- 1-Click Instant Demo Login (For Tutor Only) -->
-    <div style="margin-top: 24px; padding: 14px; background: rgba(2, 44, 34, 0.7); border: 1px dashed #059669; border-radius: 10px;">
-      <div style="font-size: 0.76rem; font-weight: 700; color: #6ee7b7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; justify-content: space-between;">
-        <span>⚡ Demo Tutor Credentials</span>
-        <span style="color: #047857;">Quick Access</span>
-      </div>
-      <div style="font-size: 0.78rem; color: #a7f3d0; margin-bottom: 8px; line-height: 1.4;">
-        CNIC: <strong style="color: #fff;">36402-1234567-1</strong> &nbsp;|&nbsp; Code: <strong style="color: #fff;">T-BW001</strong><br>
-        Email: <strong style="color: #fff;">tutor@mariahome.com</strong> &nbsp;|&nbsp; Pass: <strong style="color: #fff;">Tutor123</strong>
-      </div>
-      <div>
-        <a href="{{ url_for('auth.quick_switch', role='tutor') }}" class="btn btn-sm" style="width: 100%; justify-content: center; background: #047857; color: #d1fae5; border: 1px solid #10b981; font-size: 0.84rem; text-decoration: none;">
-          🎓 1-Click Login (Sir Usman)
-        </a>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px; text-align: center;">
+    <div style="margin-top: 24px; text-align: center;">
       <a href="{{ url_for('main.index') }}" style="color: #a7f3d0; font-size: 0.85rem; text-decoration: none;">
         ← Back to Public Website
       </a>

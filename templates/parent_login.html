@@ -34,7 +34,7 @@
           Parent CNIC or Registered Email
         </label>
         <input id="identifier" name="identifier" type="text" autocomplete="username" required
-               placeholder="36402-7654321-1 or parent@mariahome.com"
+               placeholder="36402-7654321-1 or parent@mariatutor.com"
                style="width: 100%; padding: 12px 14px; background: #431407; border: 1.5px solid #ea580c; border-radius: 8px; color: #fff; font-size: 0.92rem;">
         <small id="cnic-parent-hint" style="display:block; color:#fdba74; font-size:0.75rem; margin-top:4px;">
           Enter 13-digit Pakistani CNIC (dashes are added automatically) or email address.
@@ -56,30 +56,13 @@
     </form>
 
     <div style="margin-top: 18px; text-align: center; font-size: 0.85rem; color: #fed7aa;">
-      Need a home tutor for your children?
+      Need a home tutor for your child?
       <a href="{{ url_for('auth.register_parent') }}" style="color: #fdba74; font-weight: 700; margin-left: 4px; text-decoration: underline;">
         Post a Tuition Request →
       </a>
     </div>
 
-    <!-- 1-Click Instant Demo Login (For Parent Only) -->
-    <div style="margin-top: 24px; padding: 14px; background: rgba(67, 20, 7, 0.7); border: 1px dashed #ea580c; border-radius: 10px;">
-      <div style="font-size: 0.76rem; font-weight: 700; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; justify-content: space-between;">
-        <span>⚡ Demo Parent Credentials</span>
-        <span style="color: #ea580c;">Quick Access</span>
-      </div>
-      <div style="font-size: 0.78rem; color: #fed7aa; margin-bottom: 8px; line-height: 1.4;">
-        CNIC: <strong style="color: #fff;">36402-7654321-1</strong> &nbsp;|&nbsp; Email: <strong style="color: #fff;">parent@mariahome.com</strong><br>
-        Password: <strong style="color: #fff;">Parent123</strong>
-      </div>
-      <div>
-        <a href="{{ url_for('auth.quick_switch', role='parent') }}" class="btn btn-sm" style="width: 100%; justify-content: center; background: #9a3412; color: #ffedd5; border: 1px solid #f97316; font-size: 0.84rem; text-decoration: none;">
-          👨‍👩‍👧 1-Click Login (Chaudhry Tariq)
-        </a>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px; text-align: center;">
+    <div style="margin-top: 24px; text-align: center;">
       <a href="{{ url_for('main.index') }}" style="color: #fed7aa; font-size: 0.85rem; text-decoration: none;">
         ← Back to Public Website
       </a>

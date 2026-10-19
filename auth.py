@@ -396,42 +396,15 @@ def login():
 
 @bp.route("/quick-switch/<role>", methods=["GET", "POST"])
 def quick_switch(role):
-    """Instantly switch between demo accounts with role-scoped isolation."""
-    role_map = {
-        "super_admin": "admin@mariahome.com",
-        "admin": "staff@mariahome.com",
-        "tutor": "tutor@mariahome.com",
-        "parent": "parent@mariahome.com",
-    }
-    target_email = role_map.get(role)
-    if not target_email:
-        flash("Invalid role specified for demo switch.", "error")
-        return redirect(url_for("main.index"))
-
-    user = User.query.filter(db.func.lower(User.email) == target_email.lower()).first()
-    if not user:
-        flash(f"Demo user for {role} not found in database. Run seed_burewala.py first.", "error")
-        return redirect(url_for("main.index"))
-
-    if user.role in {"super_admin", "admin"}:
-        session["admin_user_id"] = str(user.id)
-        session["_user_id"] = str(user.id)
-        login_user(user, remember=False, fresh=True)
-        flash(f"Switched to {user.role.replace('_', ' ').title()} demo account ({target_email}).", "success")
-        return redirect(url_for("superadmin.dashboard" if user.role == "super_admin" else "admin.dashboard"))
-    elif user.role == "tutor":
-        session["tutor_user_id"] = str(user.id)
-        session["_user_id"] = str(user.id)
-        login_user(user, remember=False, fresh=True)
-        flash(f"Switched to Tutor demo account ({target_email}).", "success")
-        return redirect(url_for("main.tutor_dashboard"))
-    elif user.role == "parent":
-        session["parent_user_id"] = str(user.id)
-        session["_user_id"] = str(user.id)
-        login_user(user, remember=False, fresh=True)
-        flash(f"Switched to Parent demo account ({target_email}).", "success")
-        return redirect(url_for("main.parent_dashboard"))
-    return redirect(url_for("main.index"))
+    """1-Click demo access is permanently disabled for live production."""
+    flash("1-Click demo access has been removed for live production. Please sign in with your credentials.", "warning")
+    if role in {"super_admin", "admin"}:
+        return redirect(url_for("auth.admin_login"))
+    elif role == "tutor":
+        return redirect(url_for("auth.tutor_login"))
+    elif role == "parent":
+        return redirect(url_for("auth.parent_login"))
+    return redirect(url_for("auth.login"))
 
 
 @bp.route("/admin/logout", methods=["GET", "POST"])

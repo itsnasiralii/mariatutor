@@ -68,7 +68,7 @@
           {% else %}CNIC / Email / Tutor ID{% endif %}
         </label>
         <input id="identifier" name="identifier" autocomplete="username" required
-               placeholder="{% if portal == 'tutor' %}36402-1234567-1 or T-BW001 or tutor@mariahome.com{% elif portal == 'admin' %}admin@mariahome.com or staff@mariahome.com{% elif portal == 'parent' %}36402-7654321-1 or parent@mariahome.com{% else %}36402-XXXXXXX-X, ID, or email{% endif %}">
+               placeholder="{% if portal == 'tutor' %}36402-1234567-1, T-BW001, or tutor@mariatutor.com{% elif portal == 'admin' %}nasir@mariatutor.com or staff@mariatutor.com{% elif portal == 'parent' %}36402-7654321-1 or parent@mariatutor.com{% else %}36402-XXXXXXX-X, ID, or email{% endif %}">
         {% if portal != 'admin' %}
         <small id="cnic-login-hint" style="display:block; color:var(--muted, #64748b); font-size:0.75rem; margin-top:4px;">
           Enter 13-digit Pakistani CNIC (dashes are added automatically) or email address.
@@ -97,30 +97,8 @@
       <a href="{{ url_for('auth.register_tutor') }}">Tutor signup</a>
     </div>
 
-    <!-- Quick 1-Click Demo Logins for instant local testing -->
-    <div style="margin-top:24px; padding:14px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px;">
-      <div style="font-size:0.78rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
-        <span>⚡ 1-Click Demo Login</span>
-        <span style="font-size:0.72rem; color:#94a3b8; font-weight:normal;">Local Development</span>
-      </div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-        <a href="{{ url_for('auth.quick_switch', role='super_admin') }}" class="btn btn-sm" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
-          👑 Super Admin
-        </a>
-        <a href="{{ url_for('auth.quick_switch', role='admin') }}" class="btn btn-sm" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
-          🛡️ Staff Admin
-        </a>
-        <a href="{{ url_for('auth.quick_switch', role='tutor') }}" class="btn btn-sm" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
-          🎓 Tutor (Usman)
-        </a>
-        <a href="{{ url_for('auth.quick_switch', role='parent') }}" class="btn btn-sm" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; text-decoration:none; text-align:center; padding:6px 8px; font-size:0.78rem; display:block;">
-          👨‍👩‍👧 Parent (Tariq)
-        </a>
-      </div>
-    </div>
-
-    <p style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:14px;margin-bottom:0;">
-      🔒 Multi-tab testing tip: To use multiple accounts simultaneously, open an <strong>Incognito Window (Ctrl+Shift+N)</strong> or use Microsoft Edge / Firefox.
+    <p style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:20px;margin-bottom:0;">
+      🔒 Secure SSL Encrypted Login · Maria Tutor Burewala
     </p>
   </div>
 </div>

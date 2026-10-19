@@ -34,7 +34,7 @@
           Staff / Admin Email Address
         </label>
         <input id="identifier" name="identifier" type="email" autocomplete="username" required
-               placeholder="admin@mariahome.com or staff@mariahome.com"
+               placeholder="nasir@mariatutor.com or staff@mariatutor.com"
                style="width: 100%; padding: 12px 14px; background: #0f172a; border: 1.5px solid #475569; border-radius: 8px; color: #fff; font-size: 0.92rem;">
       </div>
 
@@ -52,23 +52,7 @@
       </button>
     </form>
 
-    <!-- 1-Click Instant Demo Login (For Admin Roles Only) -->
-    <div style="margin-top: 24px; padding: 14px; background: rgba(15, 23, 42, 0.6); border: 1px dashed #475569; border-radius: 10px;">
-      <div style="font-size: 0.76rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; justify-content: space-between;">
-        <span>⚡ 1-Click Staff Demo Access</span>
-        <span style="color: #64748b;">Local Dev</span>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <a href="{{ url_for('auth.quick_switch', role='super_admin') }}" class="btn btn-sm" style="justify-content: center; background: #312e81; color: #c7d2fe; border: 1px solid #4338ca; font-size: 0.8rem; text-decoration: none;">
-          👑 Super Admin
-        </a>
-        <a href="{{ url_for('auth.quick_switch', role='admin') }}" class="btn btn-sm" style="justify-content: center; background: #0c4a6e; color: #bae6fd; border: 1px solid #0284c7; font-size: 0.8rem; text-decoration: none;">
-          🛡️ Staff Admin
-        </a>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px; text-align: center;">
+    <div style="margin-top: 24px; text-align: center;">
       <a href="{{ url_for('main.index') }}" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">
         ← Back to Public Website
       </a>

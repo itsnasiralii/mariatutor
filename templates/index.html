@@ -13,10 +13,10 @@
     <h1>Find the right home tutor,<br><span>through a safe &amp; verified process.</span></h1>
     <p>Parents submit class, subjects &amp; timing needs. Verified tutors receive anonymized opportunities across Burewala's 12 sectors.</p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="{{ url_for('auth.register_parent') }}" style="background:#fff;color:#4f46e5;font-weight:700;">📚 Request a Tutor (Parents)</a>
-      <a class="btn" href="{{ url_for('main.parent_explore_tutors') }}" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:700;">🔍 Explore Tutors Directory</a>
-      <a class="btn" href="{{ url_for('auth.register_tutor') }}" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);font-weight:700;">🎓 Join as a Tutor</a>
-      <a class="btn" href="{{ url_for('auth.parent_login') }}" style="background:transparent;color:#fed7aa;border:1.5px solid rgba(255,255,255,.3);">Parent Login →</a>
+      <a class="btn btn-primary" href="{{ url_for('auth.register_parent') }}" target="_blank" style="background:#fff;color:#4f46e5;font-weight:700;">📚 Request a Tutor (Parents)</a>
+      <a class="btn" href="{{ url_for('main.parent_explore_tutors') }}" target="_blank" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:700;">🔍 Explore Tutors Directory</a>
+      <a class="btn" href="{{ url_for('auth.register_tutor') }}" target="_blank" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);font-weight:700;">🎓 Join as a Tutor</a>
+      <a class="btn" href="{{ url_for('auth.parent_login') }}" target="_blank" style="background:transparent;color:#fed7aa;border:1.5px solid rgba(255,255,255,.3);">Parent Login →</a>
     </div>
   </section>
 
@@ -37,6 +37,38 @@
     <div class="stat-item">
       <strong>Free</strong>
       <span>For Parents</span>
+    </div>
+  </div>
+
+  <!-- ══ DIRECT PORTAL LAUNCHER (OPEN IN NEW WINDOW) ══ -->
+  <div style="max-width: 1100px; margin: -10px auto 36px; padding: 0 16px;">
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 18px 24px; box-shadow: 0 8px 20px -4px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+          🌐
+        </div>
+        <div>
+          <div style="font-size: 0.74rem; font-weight: 800; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.5px;">Live Portals &amp; Direct Access</div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #0f172a; margin: 0;">Open Website Portals in New Window</h3>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <a href="{{ url_for('main.index') }}" target="_blank" class="btn btn-sm" style="background: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.84rem;">
+          🌐 Open Website ↗
+        </a>
+        <a href="{{ url_for('auth.register_parent') }}" target="_blank" class="btn btn-sm" style="background: #ea580c; color: #fff; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.84rem; box-shadow: 0 2px 6px rgba(234,88,12,0.25);">
+          📚 Request a Tutor ↗
+        </a>
+        <a href="{{ url_for('auth.parent_login') }}" target="_blank" class="btn btn-sm" style="background: #fff; color: #ea580c; border: 1.5px solid #fed7aa; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.84rem;">
+          👨‍👩‍👧 Parent Portal ↗
+        </a>
+        <a href="{{ url_for('auth.tutor_login') }}" target="_blank" class="btn btn-sm" style="background: #fff; color: #16a34a; border: 1.5px solid #bbf7d0; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.84rem;">
+          🎓 Tutor Portal ↗
+        </a>
+        <a href="{{ url_for('auth.admin_login') }}" target="_blank" class="btn btn-sm" style="background: #0f172a; color: #cbd5e1; border: 1.5px solid #334155; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 0.84rem;">
+          🛡️ Staff / Admin ↗
+        </a>
+      </div>
     </div>
   </div>
 
@@ -71,10 +103,10 @@
           </ul>
         </div>
         <div class="pathway-card-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a href="{{ url_for('auth.register_parent') }}" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#ea580c; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+          <a href="{{ url_for('auth.register_parent') }}" target="_blank" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#ea580c; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
             Request a Tutor →
           </a>
-          <a href="{{ url_for('auth.parent_login') }}" class="btn" style="background:#fff; color:#ea580c; border:1.5px solid #ea580c; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
+          <a href="{{ url_for('auth.parent_login') }}" target="_blank" class="btn" style="background:#fff; color:#ea580c; border:1.5px solid #ea580c; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
             Parent Login
           </a>
         </div>
@@ -103,10 +135,10 @@
           </ul>
         </div>
         <div class="pathway-card-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a href="{{ url_for('auth.register_tutor') }}" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#16a34a; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+          <a href="{{ url_for('auth.register_tutor') }}" target="_blank" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#16a34a; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
             Join as Tutor →
           </a>
-          <a href="{{ url_for('auth.tutor_login') }}" class="btn" style="background:#fff; color:#16a34a; border:1.5px solid #16a34a; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
+          <a href="{{ url_for('auth.tutor_login') }}" target="_blank" class="btn" style="background:#fff; color:#16a34a; border:1.5px solid #16a34a; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
             Tutor Login
           </a>
         </div>
@@ -176,15 +208,15 @@
     <h2>Ready to find the perfect tutor?</h2>
     <p>Join hundreds of families in Burewala who trust our platform.</p>
     <div class="hero-actions" style="justify-content:center;">
-      <a class="btn" href="{{ url_for('auth.register_parent') }}" style="background:#fff;color:#4f46e5;font-weight:700;">Get Started Free</a>
-      <a class="btn" href="{{ url_for('auth.register_tutor') }}" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Join as Tutor</a>
+      <a class="btn" href="{{ url_for('auth.register_parent') }}" target="_blank" style="background:#fff;color:#4f46e5;font-weight:700;">Get Started Free</a>
+      <a class="btn" href="{{ url_for('auth.register_tutor') }}" target="_blank" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Join as Tutor</a>
     </div>
   </section>
 
   <footer class="home-footer">
     <span>© 2026 Burewala Tutor Marketplace · Phase 1</span> &nbsp;·&nbsp;
     <a href="{{ url_for('main.privacy') }}">Privacy &amp; Safety</a> &nbsp;·&nbsp;
-    <a href="{{ url_for('auth.admin_login') }}" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
+    <a href="{{ url_for('auth.admin_login') }}" target="_blank" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
   </footer>
 </div>
 {% endblock %}
