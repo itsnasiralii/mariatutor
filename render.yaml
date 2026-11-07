@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: burewala-tutor-marketplace
+    name: mariatutor
     plan: free
     runtime: python
     buildCommand: pip install -r requirements.txt
