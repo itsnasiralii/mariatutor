@@ -1,0 +1,198 @@
+@extends('layouts.base')
+
+@section('title', 'Maria Tutor — Burewala Home Tuition')
+
+@section('public_content')
+<div class="home-layout">
+
+  <!-- Responsive Navbar -->
+  @include('partials.nav_home')
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="eyebrow" style="color:#a5b4fc;margin-bottom:12px;">BUREWALA · PUNJAB · PAKISTAN</p>
+    <h1>Find the right home tutor,<br><span>through a safe &amp; verified process.</span></h1>
+    <p>Parents submit class, subjects &amp; timing needs. Verified tutors receive anonymized opportunities across Burewala's 12 sectors.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ route('auth.register_parent') }}" target="_blank" style="background:#fff;color:#4f46e5;font-weight:700;">📚 Request a Tutor (Parents)</a>
+      <a class="btn" href="{{ route('explore.tutors') }}" target="_blank" style="background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:700;">🔍 Explore Tutors Directory</a>
+      <a class="btn" href="{{ route('auth.register_tutor') }}" target="_blank" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);font-weight:700;">🎓 Join as a Tutor</a>
+      <a class="btn" href="{{ route('auth.parent_login') }}" target="_blank" style="background:transparent;color:#fed7aa;border:1.5px solid rgba(255,255,255,.3);">Parent Login →</a>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <strong>{{ $tutorCount }}</strong>
+      <span>Approved Tutors</span>
+    </div>
+    <div class="stat-item">
+      <strong>100%</strong>
+      <span>Verified Profiles</span>
+    </div>
+    <div class="stat-item">
+      <strong>Private</strong>
+      <span>Contact Policy</span>
+    </div>
+    <div class="stat-item">
+      <strong>Free</strong>
+      <span>For Parents</span>
+    </div>
+  </div>
+
+  <!-- Primary Options for Parents & Tutors -->
+  <section class="features-section" style="padding-bottom: 24px;">
+    <p class="eyebrow" style="text-align:center;margin-bottom:8px;">CHOOSE YOUR PATHWAY</p>
+    <h2 style="text-align:center;margin-bottom:28px;">Connect with verified home tuition across Burewala</h2>
+
+    <div class="pathway-grid">
+
+      <!-- 1. Parent Card -->
+      <div class="pathway-card parent-card" style="background:#ffffff; border:2.5px solid #fed7aa; border-radius:18px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(234,88,12,0.1); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">
+        <div>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:52px; height:52px; border-radius:14px; background:#ffedd5; display:flex; align-items:center; justify-content:center; font-size:1.8rem;">
+              👨‍👩‍👧
+            </div>
+            <div>
+              <h3 style="font-size:1.25rem; font-weight:800; color:#9a3412; margin:0;">Parents &amp; Students</h3>
+              <span style="font-size:0.84rem; color:#c2410c; font-weight:600;">Find an Expert Home or Online Tutor</span>
+            </div>
+          </div>
+          <p style="color:#64748b; font-size:0.9rem; margin-bottom:18px; line-height:1.55;">
+            Submit your child's class, subject, and area in Burewala. Our team arranges a verified tutor demo without revealing your phone number publicly.
+          </p>
+          <ul style="font-size:0.86rem; color:#475569; margin-bottom:24px; display:flex; flex-direction:column; gap:8px;">
+            <li>✓ Free tuition matching for Burewala families</li>
+            <li>✓ Verified background &amp; CNIC-checked tutors</li>
+            <li>✓ Home visits across all 12 Burewala sectors</li>
+            <li>✓ 100% private contact protection policy</li>
+          </ul>
+        </div>
+        <div class="pathway-card-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a href="{{ route('auth.register_parent') }}" target="_blank" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#ea580c; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+            Request a Tutor →
+          </a>
+          <a href="{{ route('auth.parent_login') }}" target="_blank" class="btn" style="background:#fff; color:#ea580c; border:1.5px solid #ea580c; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
+            Parent Login
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. Tutor Card -->
+      <div class="pathway-card tutor-card" style="background:#ffffff; border:2.5px solid #bbf7d0; border-radius:18px; padding:32px 28px; box-shadow:0 10px 25px -5px rgba(22,163,74,0.1); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">
+        <div>
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:52px; height:52px; border-radius:14px; background:#dcfce7; display:flex; align-items:center; justify-content:center; font-size:1.8rem;">
+              🎓
+            </div>
+            <div>
+              <h3 style="font-size:1.25rem; font-weight:800; color:#166534; margin:0;">Tutors &amp; Teachers</h3>
+              <span style="font-size:0.84rem; color:#15803d; font-weight:600;">Teach &amp; Earn in Burewala</span>
+            </div>
+          </div>
+          <p style="color:#64748b; font-size:0.9rem; margin-bottom:18px; line-height:1.55;">
+            Build your verified tutor profile. Browse anonymized student leads across Satellite Town, College Road, Model Town, and nearby sectors.
+          </p>
+          <ul style="font-size:0.86rem; color:#475569; margin-bottom:24px; display:flex; flex-direction:column; gap:8px;">
+            <li>✓ Set your own expected monthly tuition fee</li>
+            <li>✓ Zero platform fee until confirmed placement</li>
+            <li>✓ Encrypted CNIC &amp; private degree document vault</li>
+            <li>✓ Direct spatial matching to nearby student homes</li>
+          </ul>
+        </div>
+        <div class="pathway-card-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a href="{{ route('auth.register_tutor') }}" target="_blank" class="btn" style="flex:1; min-width:140px; justify-content:center; background:#16a34a; color:#fff; font-weight:700; padding:12px; font-size:0.92rem; border-radius:8px;">
+            Join as Tutor →
+          </a>
+          <a href="{{ route('auth.tutor_login') }}" target="_blank" class="btn" style="background:#fff; color:#16a34a; border:1.5px solid #16a34a; font-weight:700; padding:12px 18px; font-size:0.92rem; border-radius:8px; min-width:120px; justify-content:center;">
+            Tutor Login
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="features-section">
+    <p class="eyebrow" style="text-align:center;margin-bottom:8px;">HOW IT WORKS</p>
+    <h2>A platform-managed introduction</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>01 · Share the requirement</h3>
+        <p>Choose subject, class, Burewala area, budget and preferred time. Takes less than 2 minutes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>02 · We shortlist carefully</h3>
+        <p>Approved tutors see only a limited area-level opportunity, then choose whether to express interest.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>03 · Meet through the platform</h3>
+        <p>An admin coordinates the demo and shares contact details only at the authorized stage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coverage + Subjects -->
+  <section class="features-section" style="padding-top:0;">
+    <div class="split" style="gap:28px;align-items:start;">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">COVERAGE</p>
+            <h3 class="card-title">Starting in Burewala</h3>
+          </div>
+        </div>
+        <p style="color:var(--muted);margin-bottom:16px;">Areas and subjects are managed as the service grows. Private addresses and exact home locations are never published.</p>
+        @if(count($areas) > 0)
+          <div class="tag-row">
+            @foreach($areas as $a)
+              <span class="tag">📍 {{ $a->name }}</span>
+            @endforeach
+          </div>
+        @else
+          <p class="muted">Burewala service areas are being set up.</p>
+        @endif
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">POPULAR SUBJECTS</p>
+            <h3 class="card-title">Available Subjects</h3>
+          </div>
+        </div>
+        @if(count($subjects) > 0)
+          <div class="tag-row">
+            @foreach($subjects as $s)
+              <span class="tag">📖 {{ $s->name }}</span>
+            @endforeach
+          </div>
+        @else
+          <p class="muted">Subjects will appear here once configured.</p>
+        @endif
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to find the perfect tutor?</h2>
+    <p>Join hundreds of families in Burewala who trust our platform.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a class="btn" href="{{ route('auth.register_parent') }}" target="_blank" style="background:#fff;color:#4f46e5;font-weight:700;">Get Started Free</a>
+      <a class="btn" href="{{ route('auth.register_tutor') }}" target="_blank" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Join as Tutor</a>
+    </div>
+  </section>
+
+  <footer class="home-footer">
+    <span>© 2026 Maria Tutor · All Rights Reserved</span> &nbsp;·&nbsp;
+    <a href="{{ route('privacy') }}">Privacy &amp; Safety</a> &nbsp;·&nbsp;
+    <a href="{{ route('auth.admin_login') }}" target="_blank" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
+  </footer>
+</div>
+@endsection
