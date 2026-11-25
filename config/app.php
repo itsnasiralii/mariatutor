@@ -123,4 +123,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'cnic_hash_key' => env('CNIC_HASH_KEY'),
+    'admin_email' => env('ADMIN_EMAIL'),
+    'admin_password' => env('ADMIN_PASSWORD'),
+    'contact_phone' => env('CONTACT_PHONE', ''),
+    'whatsapp_number' => env('WHATSAPP_NUMBER', ''),
+
 ];

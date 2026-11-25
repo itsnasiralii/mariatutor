@@ -48,7 +48,7 @@
   </div>
 </div>
 
-<div class="grid two" style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+<div class="grid-two">
   <!-- Pending Tutors Panel -->
   <div class="panel">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">

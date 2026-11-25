@@ -1,114 +1,114 @@
 @extends('layouts.base')
 
-@section('title', 'Request a Home or Online Tutor — Maria Tutor')
+@section('title', 'Request a Home or Online Tutor | Maria Tutor')
 @section('page_title', 'New Tuition Request')
 
 @section('content')
 <div style="max-width: 760px; margin: 0 auto; padding-bottom: 40px;">
 
-  <div class="page-header" style="margin-bottom: 24px;">
+  <div class="page-header">
     <div>
       <div class="breadcrumb">Parent Portal / <span>New Request</span></div>
       <h1>Request a Home or Online Tutor</h1>
-      <p class="muted">Tell us your student's learning targets. Maria Tutor verifies credentials, checks spatial proximity in Burewala, and coordinates a free demo class.</p>
+      <p class="muted">Tell us your student's learning targets. Maria Tutor checks tutor credentials, spatial proximity in Burewala, and coordinates a free demo class.</p>
     </div>
   </div>
 
   @if($preferredTutor)
-    <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:16px 20px; margin-bottom:24px; display:flex; align-items:center; gap:14px;">
-      <div style="font-size:2rem;">🎓</div>
+    <div class="notice privacy" style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+      <div style="font-size:2rem;" aria-hidden="true">🎓</div>
       <div>
-        <strong style="color:#166534; font-size:1.05rem;">Booking Preferred Tutor: {{ $preferredTutor->full_name }} ({{ $preferredTutor->tutor_code }})</strong>
-        <p style="margin:4px 0 0 0; color:#15803d; font-size:0.86rem;">Our administration will prioritize connecting your request directly with this teacher.</p>
+        <strong style="font-size:1.02rem;">Booking Preferred Tutor: {{ $preferredTutor->full_name }} ({{ $preferredTutor->tutor_code }})</strong>
+        <p style="margin:4px 0 0 0; font-size:0.86rem;">Our administration will prioritize connecting your request directly with this teacher.</p>
       </div>
     </div>
   @endif
 
-  <div class="panel" style="padding: 28px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;">
+  <div class="panel">
     <form method="POST" action="{{ route('parent.request_submit') }}">
       @csrf
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+      <div class="form-row-2" style="margin-bottom: 20px;">
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">📚 Subject *</label>
-          <select name="subject_id" required style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-subject"><span aria-hidden="true">📚</span> Subject *</label>
+          <select id="req-subject" name="subject_id" required>
             <option value="">Select Subject</option>
             @foreach($subjects as $s)
-              <option value="{{ $s->id }}">{{ $s->name }}</option>
+              <option value="{{ $s->id }}" {{ (int) old('subject_id') === $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
             @endforeach
           </select>
         </div>
 
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">🎓 Class / Grade Level *</label>
-          <select name="class_id" required style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-class"><span aria-hidden="true">🎓</span> Class / Grade Level *</label>
+          <select id="req-class" name="class_id" required>
             <option value="">Select Grade</option>
             @foreach($classes as $c)
-              <option value="{{ $c->id }}">{{ $c->name }}</option>
+              <option value="{{ $c->id }}" {{ (int) old('class_id') === $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
             @endforeach
           </select>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+      <div class="form-row-2" style="margin-bottom: 20px;">
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">📍 Burewala Sector / Area *</label>
-          <select name="area_id" required style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-area"><span aria-hidden="true">📍</span> Burewala Sector / Area *</label>
+          <select id="req-area" name="area_id" required>
             <option value="">Select Area</option>
             @foreach($areas as $a)
-              <option value="{{ $a->id }}">{{ $a->name }}</option>
+              <option value="{{ $a->id }}" {{ (int) old('area_id') === $a->id ? 'selected' : '' }}>{{ $a->name }}</option>
             @endforeach
           </select>
         </div>
 
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">🏠 Sub-area / Landmark (Optional)</label>
-          <input name="subarea_text" placeholder="e.g. Near Masjid Bilal, Block B" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-subarea"><span aria-hidden="true">🏠</span> Sub-area / Landmark (Optional)</label>
+          <input id="req-subarea" name="subarea_text" value="{{ old('subarea_text') }}" maxlength="120" placeholder="e.g. Near Masjid Bilal, Block B">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+      <div class="form-row-2" style="margin-bottom: 20px;">
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">🚗 Tuition Mode *</label>
-          <select name="mode_id" required style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-mode"><span aria-hidden="true">🚗</span> Tuition Mode *</label>
+          <select id="req-mode" name="mode_id" required>
             @foreach($modes as $m)
-              <option value="{{ $m->id }}">{{ $m->name }}</option>
+              <option value="{{ $m->id }}" {{ (int) old('mode_id') === $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
             @endforeach
           </select>
         </div>
 
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">👤 Tutor Gender Preference *</label>
-          <select name="tutor_gender_preference" required style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
-            <option value="Any">Any Gender (Best Match)</option>
-            <option value="Female">Female Teacher Only</option>
-            <option value="Male">Male Teacher Only</option>
+          <label for="req-gender"><span aria-hidden="true">👤</span> Tutor Gender Preference *</label>
+          <select id="req-gender" name="tutor_gender_preference" required>
+            <option value="Any" {{ old('tutor_gender_preference') === 'Any' ? 'selected' : '' }}>Any Gender (Best Match)</option>
+            <option value="Female" {{ old('tutor_gender_preference') === 'Female' ? 'selected' : '' }}>Female Teacher Only</option>
+            <option value="Male" {{ old('tutor_gender_preference') === 'Male' ? 'selected' : '' }}>Male Teacher Only</option>
           </select>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+      <div class="form-row-2" style="margin-bottom: 20px;">
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">⏰ Preferred Daily Time *</label>
-          <input name="preferred_time" required placeholder="e.g. 4:30 PM - 6:00 PM" style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+          <label for="req-time"><span aria-hidden="true">⏰</span> Preferred Daily Time *</label>
+          <input id="req-time" name="preferred_time" value="{{ old('preferred_time') }}" required maxlength="120" placeholder="e.g. 4:30 PM - 6:00 PM">
         </div>
 
         <div>
-          <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">💰 Expected Monthly Budget (PKR)</label>
+          <label><span aria-hidden="true">💰</span> Expected Monthly Budget (PKR)</label>
           <div style="display:flex; gap:8px;">
-            <input type="number" name="budget_min" placeholder="Min (e.g. 10000)" step="500" style="width:50%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
-            <input type="number" name="budget_max" placeholder="Max (e.g. 18000)" step="500" style="width:50%; padding:10px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+            <input type="number" name="budget_min" value="{{ old('budget_min') }}" min="0" max="500000" step="500" placeholder="Min (e.g. 10000)" aria-label="Minimum monthly budget in PKR">
+            <input type="number" name="budget_max" value="{{ old('budget_max') }}" min="0" max="500000" step="500" placeholder="Max (e.g. 18000)" aria-label="Maximum monthly budget in PKR">
           </div>
         </div>
       </div>
 
-      <div style="margin-bottom: 24px;">
-        <label style="display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px;">📝 Special Requirements or Notes</label>
-        <textarea name="requirements" rows="3" placeholder="e.g. Student needs extra attention in Math trigonometry and Physics numericals. Board exam prep needed." style="width:100%; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:8px; font-size:0.9rem;"></textarea>
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label for="req-notes"><span aria-hidden="true">📝</span> Special Requirements or Notes</label>
+        <textarea id="req-notes" name="requirements" rows="3" maxlength="500" placeholder="e.g. Student needs extra attention in Math trigonometry and Physics numericals.">{{ old('requirements') }}</textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:1rem; font-weight:700;">
-        Submit Tuition Request →
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:1rem;">
+        Submit Confidential Request →
       </button>
     </form>
   </div>

@@ -11,20 +11,23 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, string ...$roles)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login')->with('warning', 'Please sign in to access this page.');
         }
 
         $user = Auth::user();
 
-        if (!in_array($user->role, $roles)) {
-            // Super Admin always has access to admin routes
-            if ($user->isSuperAdmin() && in_array('admin', $roles)) {
-                return $next($request);
-            }
+        if (! $user->active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
+            return redirect()->route('login')->with('error', 'Your account has been deactivated. Please contact support.');
+        }
+
+        if (! in_array((string) $user->role, $roles, true)) {
             abort(403, 'Unauthorized access for your account role.');
         }
 

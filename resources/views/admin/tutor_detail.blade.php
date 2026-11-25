@@ -1,90 +1,101 @@
 @extends('layouts.base')
-@section('title', 'Tutor Review ' . $tutor->tutor_code)
+@section('title', 'Tutor Review ' . $tutor->tutor_code . ' | Maria Tutor')
+@section('page_title', 'Tutor Verification: ' . $tutor->tutor_code)
 
 @section('content')
-<div class="page-head" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+@php
+  $statusEnum = \App\Enums\VerificationStatus::tryFrom($tutor->verification_status);
+  $badgeClass = $statusEnum ? $statusEnum->badgeClass() : 'badge-warning';
+@endphp
+<div class="page-head">
   <div>
-    <p class="eyebrow" style="color: #6366f1; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; margin: 0 0 4px 0;">TUTOR {{ $tutor->tutor_code }}</p>
-    <h1 style="font-size: 2rem; font-weight: 800; margin: 0 0 8px 0;">{{ $tutor->full_name }}</h1>
-    <span class="badge {{ $tutor->verification_status == 'Approved' ? 'badge-success' : ($tutor->verification_status == 'Rejected' ? 'badge-danger' : 'badge-warning') }}" style="padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 700;">
-      {{ $tutor->verification_status }}
-    </span>
+    <p class="eyebrow">TUTOR {{ $tutor->tutor_code }}</p>
+    <h1 style="font-size: 1.75rem; font-weight: 800; margin: 4px 0 8px 0;">{{ $tutor->full_name }}</h1>
+    <span class="badge {{ $badgeClass }}">{{ $tutor->verification_status }}</span>
   </div>
-  <div style="display: flex; gap: 8px;">
+  <div class="actions">
     <a class="btn btn-secondary" href="{{ route('admin.tutors') }}">← Back to Tutors</a>
   </div>
 </div>
 
-<div class="cards two" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-  <article class="card" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 24px;">
-    <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 16px;">Tutor Profile</h2>
+<div class="cards two" style="margin-bottom: 24px;">
+  <article class="card">
+    <h2>Tutor Profile</h2>
     <p><b>Phone:</b> {{ $tutor->user->phone ?? '—' }}</p>
     <p><b>Email:</b> {{ $tutor->user->email ?? '—' }}</p>
-    <p><b>Qualification:</b> {{ $tutor->qualification ?? '—' }}</p>
-    <p><b>Experience:</b> {{ $tutor->experience ?? '—' }}</p>
-    <p><b>Availability:</b> {{ $tutor->availability ?? '—' }}</p>
+    <p><b>Qualification:</b> {{ $tutor->qualification ?: '—' }}</p>
+    <p><b>Experience:</b> {{ $tutor->experience ?: '—' }}</p>
+    <p><b>Availability:</b> {{ $tutor->availability ?: '—' }}</p>
     <p><b>Gender:</b> {{ $tutor->gender }} · <b>CNIC Advisory Hint:</b> {{ $tutor->cnic_gender_hint ?? '—' }}</p>
-    <p><b>Selected Catalog Items:</b> 
+    <p><b>Selected Catalog Items:</b>
       @if($tutor->catalog && count($tutor->catalog) > 0)
         {{ $tutor->catalog->pluck('name')->join(', ') }}
       @else
         <span class="muted">None selected</span>
       @endif
     </p>
-    <p><b>Expected Fee:</b> {{ $tutor->expected_fee_min ?? '—' }}–{{ $tutor->expected_fee_max ?? '—' }} PKR/month</p>
-    <p style="font-size: 0.85rem; color: #64748b; margin-top: 12px; background: #f8fafc; padding: 10px; border-radius: 8px;">
-      🔒 <b>CNIC Security:</b> Raw CNIC is never persisted in plaintext; stored as keyed HMAC-SHA256 fingerprint.
+    <p><b>Expected Fee:</b> {{ $tutor->expected_fee_min ? number_format($tutor->expected_fee_min) : '—' }} – {{ $tutor->expected_fee_max ? number_format($tutor->expected_fee_max) : '—' }} PKR/month</p>
+    <p class="notice" style="margin-top: 14px; font-size: 0.84rem;">
+      <span aria-hidden="true">🔒</span> <b>CNIC Security:</b> Raw CNIC is never persisted in plaintext; stored as a keyed HMAC-SHA256 digest.
     </p>
   </article>
 
-  <article class="card" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 24px;">
-    <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 16px;">Verification Decision</h2>
+  <article class="card">
+    <h2>Verification Decision</h2>
     <form method="POST" action="{{ route('admin.tutor_verify', $tutor->id) }}">
       @csrf
-      <label style="display: block; margin-bottom: 8px; font-weight: 600;">Verification Status
-        <select name="status" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 6px;">
-          @foreach(['Pending', 'Under Review', 'Approved', 'Rejected'] as $s)
-            <option value="{{ $s }}" {{ $tutor->verification_status == $s ? 'selected' : '' }}>{{ $s }}</option>
+      <div class="form-group">
+        <label for="verify-status">Verification Status</label>
+        <select id="verify-status" name="status">
+          @foreach($statuses ?? \App\Enums\VerificationStatus::values() as $s)
+            <option value="{{ $s }}" {{ $tutor->verification_status === $s ? 'selected' : '' }}>{{ $s }}</option>
           @endforeach
         </select>
-      </label>
+      </div>
 
-      <label style="display: block; margin-top: 14px; margin-bottom: 8px; font-weight: 600;">Private Decision Note
-        <textarea name="note" maxlength="500" rows="4" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 6px;">{{ $tutor->verification_note }}</textarea>
-      </label>
+      <div class="form-group">
+        <label for="verify-note">Private Decision Note</label>
+        <textarea id="verify-note" name="note" maxlength="500" rows="4">{{ old('note', $tutor->verification_note) }}</textarea>
+      </div>
 
-      <button class="btn btn-primary" type="submit" style="margin-top: 16px; width: 100%; padding: 12px; font-weight: 700; background: #4f46e5; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Save Verification Decision</button>
+      <button class="btn btn-primary" type="submit" style="width: 100%; justify-content: center; padding: 12px;">Save Verification Decision</button>
     </form>
   </article>
 </div>
 
-<section class="card" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
-  <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 16px;">Private Document Vault</h2>
+<section class="card">
+  <h2>Private Document Vault ({{ $tutor->documents ? count($tutor->documents) : 0 }} / {{ \App\Http\Controllers\TutorController::MAX_DOCUMENTS_PER_TUTOR }})</h2>
   @if($tutor->documents && count($tutor->documents) > 0)
     <div class="table-wrap">
-      <table style="width: 100%; border-collapse: collapse;">
+      <table>
         <thead>
-          <tr style="border-bottom: 2px solid #e2e8f0; text-align: left;">
-            <th style="padding: 10px;">Document Type</th>
-            <th style="padding: 10px;">Original Filename</th>
-            <th style="padding: 10px;">Uploaded</th>
-            <th style="padding: 10px;">Status</th>
+          <tr>
+            <th>Document Type</th>
+            <th>Original Filename</th>
+            <th>Uploaded</th>
+            <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           @foreach($tutor->documents as $doc)
-            <tr style="border-bottom: 1px solid #f1f5f9;">
-              <td style="padding: 10px;">{{ $doc->document_type }}</td>
-              <td style="padding: 10px;">{{ $doc->original_filename }}</td>
-              <td style="padding: 10px;">{{ $doc->created_at->format('M d, Y') }}</td>
-              <td style="padding: 10px;"><span class="badge badge-info">{{ $doc->review_status }}</span></td>
+            <tr>
+              <td>{{ $doc->document_type }}</td>
+              <td>{{ $doc->original_name }}</td>
+              <td>{{ ($doc->uploaded_at ?? $doc->created_at)?->format('M d, Y') }}</td>
+              <td><span class="badge badge-info">{{ $doc->review_status }}</span></td>
+              <td>
+                <a href="{{ route('admin.document_download', $doc->id) }}" class="btn btn-sm btn-primary">
+                  Download
+                </a>
+              </td>
             </tr>
           @endforeach
         </tbody>
       </table>
     </div>
   @else
-    <p class="muted" style="color: #64748b;">No documents uploaded yet.</p>
+    <p class="muted">No verification documents uploaded yet.</p>
   @endif
 </section>
 @endsection

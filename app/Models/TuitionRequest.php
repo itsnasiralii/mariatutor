@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TuitionRequest extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'public_ref',
         'parent_user_id',

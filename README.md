@@ -1,20 +1,20 @@
-# Maria Tutor — Burewala Home & Online Tutor Marketplace (Laravel Edition)
+# Maria Tutor — Burewala Home & Online Tutor Marketplace
 
-Production-ready, highly secure Laravel 12 application for **Maria Tutor Burewala** (`mariatutor.pk`), designed for native deployment via **Plesk Laravel Toolkit** or standard PHP 8.2+ / MySQL / SQLite hosting environments.
-
----
-
-## 🌟 Overview & Key Architecture
-- **Framework**: Laravel 12.x / PHP 8.2+
-- **Database Support**: MySQL / MariaDB (Production in Plesk) & SQLite (Local testing)
-- **Zero-Leakage Security**: Keyed HMAC-SHA256 fingerprint hashing for CNIC and user identifiers. Raw CNIC numbers are never stored in plaintext.
-- **Burewala Spatial Matching**: Adjacency-based lead matching across 12 sectors & residential areas of Burewala.
-- **Multi-Role Authentication**: `super_admin`, `admin`, `tutor`, `parent` with custom role middleware.
-- **Dynamic Placement Monetization**: Real-time commission rule engine with immutable fee snapshotting on lead placement.
+Production Laravel application for **Maria Tutor** (`mariatutor.pk`), built for **Plesk Laravel Toolkit** or standard PHP 8.3+ / MySQL / SQLite environments.
 
 ---
 
-## 🚀 Quick Setup (Local Development)
+## Overview & Key Architecture
+- **Framework**: Laravel 13.x / PHP 8.3+
+- **Database Support**: MySQL / MariaDB (Production in Plesk) & SQLite (Local development / automated tests)
+- **Zero-Plaintext CNIC Security**: Keyed HMAC-SHA256 fingerprint hashing using a dedicated `CNIC_HASH_KEY` with domain-separated prefixes (`cnic:`, `email:`, `phone:`). Raw CNIC numbers are never stored in plaintext.
+- **Burewala Spatial Matching**: Adjacency-based lead matching across 12 residential sectors of Burewala inside atomic database transactions.
+- **Multi-Role Access Control**: `super_admin`, `admin`, `tutor`, `parent` backed by `App\Enums\UserRole`, role middleware, rate limiting, security headers, and `AuditEvent` logging.
+- **Private Verification Vault**: MIME-validated document uploads stored outside `public/`, accessible only to administrators via audited streaming downloads.
+
+---
+
+## Quick Setup (Local Development)
 
 ```bash
 # 1. Clone the repository
@@ -28,71 +28,48 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
-# 4. Run Migrations & Seed Burewala Catalog + Predefined Accounts
+# 4. Run migrations & seed Burewala catalog (prints random local demo credentials to console)
 php artisan migrate:fresh --seed
 
-# 5. Run local test suite (100% test coverage)
+# 5. Run automated feature & security test suite
 php artisan test
 
 # 6. Start development server
 php artisan serve
 ```
 
----
-
-## 🔑 Predefined Accounts (Seeded Credentials)
-
-| Role | Email / Phone | Password | Access Portal |
-|---|---|---|---|
-| **Super Admin** | `nasir@mariatutor.com` | `123` | `/superadmin/dashboard` |
-| **Admin / Staff** | `staff@mariatutor.com` | `123` | `/admin/dashboard` |
-| **Demo Tutor** | `tutor@mariatutor.com` | `123` | `/tutor/dashboard` |
-| **Demo Parent** | `parent@mariatutor.com` | `123` | `/parent/dashboard` |
+> **Security Note**: `DatabaseSeeder` never seeds demo accounts in `production`. In production, `ADMIN_EMAIL` and `ADMIN_PASSWORD` must be provided via `.env`.
 
 ---
 
-## 🌐 Plesk Obsidian Deployment Guide (Plesk Laravel Toolkit)
+## Required Production Environment Variables (`.env`)
 
-Maria Tutor is engineered to run seamlessly with Plesk Laravel Toolkit on `srvlxm-core56.iv4xsgo.com` for `mariatutor.pk`:
+```env
+APP_NAME="Maria Tutor"
+APP_ENV=production
+APP_KEY=base64:...
+APP_DEBUG=false
+APP_URL=https://mariatutor.pk
 
-1. **Open Plesk Control Panel**:
-   - Navigate to **Websites & Domains** > `mariatutor.pk`.
-2. **Access Laravel Toolkit**:
-   - In the left sidebar or domain dashboard, click **Laravel**.
-   - Click **Install Application** or connect to your GitHub repository:
-     - **Repository**: `https://github.com/itsnasiralii/mariatutor.git`
-     - **Branch**: `main`
-3. **Configure Environment (`.env`)**:
-   - In Plesk Laravel Toolkit, click **Environment (.env)**.
-   - Set:
-     ```env
-     APP_NAME="Maria Tutor Burewala"
-     APP_ENV=production
-     APP_KEY=base64:... (click Generate Key)
-     APP_DEBUG=false
-     APP_URL=https://mariatutor.pk
+# Dedicated 32+ character secret key for HMAC-SHA256 identifier & CNIC hashing
+CNIC_HASH_KEY=replace_with_strong_random_secret
 
-     DB_CONNECTION=mysql
-     DB_HOST=localhost
-     DB_PORT=3306
-     DB_DATABASE=your_plesk_db_name
-     DB_USERNAME=your_plesk_db_user
-     DB_PASSWORD=your_plesk_db_password
-     ```
-4. **Run Migrations & Seeders in Plesk**:
-   - In the Laravel Toolkit dashboard, go to the **Artisan** tab.
-   - Run: `migrate --force`
-   - Run: `db:seed --force`
-5. **Set Document Root**:
-   - Plesk Laravel Toolkit automatically sets the document root to `/httpdocs/public`.
-   - Your site `https://mariatutor.pk` is immediately live!
+# Initial Super Admin bootstrap credentials (used only by db:seed)
+ADMIN_EMAIL=admin@mariatutor.pk
+ADMIN_PASSWORD=replace_with_strong_password
 
----
+# Public support contact details (optional)
+CONTACT_PHONE=
+WHATSAPP_NUMBER=
 
-## 🧪 Automated Tests
-
-Run the full automated test suite anytime:
-```bash
-php artisan test
+LOG_LEVEL=warning
+SESSION_DRIVER=database
+SESSION_ENCRYPT=true
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
 ```
-All route checks, authentication guards, parent request submissions, tutor profile vaulting, and admin pipelines pass with 100% assertions.
+
+### Rotating `CNIC_HASH_KEY` on Existing Installations
+1. Back up the production database first.
+2. Update `CNIC_HASH_KEY` in `.env` and clear config cache (`php artisan config:clear`).
+3. Run `php artisan security:rehash-identifiers` to re-hash stored email and phone `identifier_hash` digests under the new key. (Because raw CNICs are never stored in plaintext, users who previously logged in by CNIC can sign in using their registered email, phone number, or `T-BW*` Tutor Code.)

@@ -2,15 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\CatalogItem;
 use App\Models\AreaAdjacency;
-use App\Models\TutorProfile;
-use App\Models\ParentProfile;
+use App\Models\CatalogItem;
 use App\Models\CommissionRule;
+use App\Models\ParentProfile;
 use App\Models\SystemSetting;
+use App\Models\TutorProfile;
+use App\Models\User;
+use App\Services\SecurityService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
@@ -60,91 +63,101 @@ class DatabaseSeeder extends Seeder
         // 3. Spatial Adjacencies
         $adjacencies = [
             ['Satellite Town', 'College Road', 1],
-            ['College Road', 'Satellite Town', 1],
+            ['Satellite Town', 'Gulshan-e-Rehman', 1],
             ['Satellite Town', 'Model Town', 2],
-            ['Model Town', 'Satellite Town', 2],
-            ['College Road', 'Gulshan-e-Rehman', 1],
-            ['Gulshan-e-Rehman', 'College Road', 1],
+            ['College Road', 'Model Town', 1],
+            ['College Road', 'Civil Lines / Canal Colony', 1],
+            ['Gulshan-e-Rehman', 'Model Town', 1],
             ['Model Town', 'Civil Lines / Canal Colony', 1],
-            ['Civil Lines / Canal Colony', 'Model Town', 1],
-            ['Housing Scheme #1', 'Housing Scheme #2', 1],
-            ['Housing Scheme #2', 'Housing Scheme #1', 1],
+            ['Civil Lines / Canal Colony', 'Vehari Road', 1],
+            ['Vehari Road', 'Multan Road', 2],
             ['Vehari Road', '50/EB', 2],
-            ['50/EB', 'Vehari Road', 2],
-            ['Multan Road', '522/EB', 2],
-            ['522/EB', 'Multan Road', 2],
+            ['Multan Road', 'Chichawatni Road', 2],
+            ['Housing Scheme #1', 'Housing Scheme #2', 1],
+            ['Housing Scheme #1', 'Satellite Town', 2],
+            ['50/EB', '522/EB', 2],
         ];
 
-        foreach ($adjacencies as [$a1, $a2, $prio]) {
-            if (isset($areaMap[$a1], $areaMap[$a2])) {
+        foreach ($adjacencies as $adj) {
+            if (isset($areaMap[$adj[0]], $areaMap[$adj[1]])) {
                 AreaAdjacency::firstOrCreate([
-                    'area_id' => $areaMap[$a1]->id,
-                    'nearby_area_id' => $areaMap[$a2]->id,
+                    'area_id' => $areaMap[$adj[0]]->id,
+                    'nearby_area_id' => $areaMap[$adj[1]]->id,
                 ], [
-                    'priority' => $prio,
+                    'priority' => $adj[2],
+                ]);
+
+                AreaAdjacency::firstOrCreate([
+                    'area_id' => $areaMap[$adj[1]]->id,
+                    'nearby_area_id' => $areaMap[$adj[0]]->id,
+                ], [
+                    'priority' => $adj[2],
                 ]);
             }
         }
 
-        // 4. Subjects
+        // 4. Academic Subjects
         $subjects = [
             'Mathematics',
             'Physics',
             'Chemistry',
             'Biology',
             'English',
-            'Computer Science',
             'Urdu',
-            'Islamiyat',
+            'Computer Science',
+            'Islamiat',
+            'Pak Studies',
             'General Science',
-            'Pakistan Studies',
-            'Commerce / Accounting',
+            'Accounting / Commerce',
         ];
+
         $subjectMap = [];
-        foreach ($subjects as $idx => $s) {
-            $subjectMap[$s] = CatalogItem::firstOrCreate([
+        foreach ($subjects as $idx => $sName) {
+            $sub = CatalogItem::firstOrCreate([
                 'kind' => 'subject',
-                'name' => $s,
+                'name' => $sName,
             ], [
                 'sort_order' => $idx + 1,
                 'active' => true,
             ]);
+            $subjectMap[$sName] = $sub;
         }
 
-        // 5. Classes
+        // 5. School Classes
         $classes = [
             'Class 1-5 (Primary)',
             'Class 6-8 (Middle)',
-            'Class 9 (SSC-I Matric)',
-            'Class 10 (SSC-II Matric)',
-            'FSc Pre-Medical (HSSC)',
-            'FSc Pre-Engineering',
-            'ICS (Computer Science)',
-            'I.Com (Commerce)',
+            'Class 9 (Matric Part 1)',
+            'Class 10 (Matric Part 2)',
             'O Levels (Cambridge)',
             'A Levels (Cambridge)',
+            'FSc Pre-Medical',
+            'FSc Pre-Engineering',
+            'ICS (Computer Science)',
+            'I.Com / B.Com',
         ];
-        $classMap = [];
-        foreach ($classes as $idx => $c) {
-            $classMap[$c] = CatalogItem::firstOrCreate([
+
+        foreach ($classes as $idx => $cName) {
+            CatalogItem::firstOrCreate([
                 'kind' => 'class',
-                'name' => $c,
+                'name' => $cName,
             ], [
                 'sort_order' => $idx + 1,
                 'active' => true,
             ]);
         }
 
-        // 6. Modes
+        // 6. Teaching Modes
         $modes = [
-            'Home Tuition (Teacher visits student home)',
-            'Online Tuition (1-on-1 Zoom / Teams)',
-            'Tutor Center (Student visits teacher)',
+            'Tutor Visits Student Home (Burewala)',
+            'Online Classes (Zoom / Google Meet)',
+            'Student Visits Tutor Academy / Home',
         ];
-        foreach ($modes as $idx => $m) {
+
+        foreach ($modes as $idx => $mName) {
             CatalogItem::firstOrCreate([
                 'kind' => 'mode',
-                'name' => $m,
+                'name' => $mName,
             ], [
                 'sort_order' => $idx + 1,
                 'active' => true,
@@ -162,135 +175,169 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 8. System Settings
+        $contactPhone = (string) (config('app.contact_phone') ?: '');
+        $whatsappNumber = (string) (config('app.whatsapp_number') ?: $contactPhone);
+
+        SystemSetting::firstOrCreate(['key' => 'brand_name'], ['value' => 'Maria Tutor']);
         SystemSetting::firstOrCreate(['key' => 'site_title'], ['value' => 'Maria Tutor']);
+        SystemSetting::firstOrCreate(['key' => 'city_focus'], ['value' => 'Burewala']);
         SystemSetting::firstOrCreate(['key' => 'city_name'], ['value' => 'Burewala']);
-        SystemSetting::firstOrCreate(['key' => 'contact_phone'], ['value' => '03280966439']);
-        SystemSetting::firstOrCreate(['key' => 'whatsapp_number'], ['value' => '03280966439']);
+        SystemSetting::firstOrCreate(['key' => 'contact_phone'], ['value' => $contactPhone]);
+        SystemSetting::firstOrCreate(['key' => 'support_whatsapp'], ['value' => $whatsappNumber]);
+        SystemSetting::firstOrCreate(['key' => 'whatsapp_number'], ['value' => $whatsappNumber]);
 
-        // 9. Predefined Live Users
-        // Helper to hash identifier
-        $hashId = fn($str) => hash_hmac('sha256', strtolower(trim($str)), 'maria-tutor-secret-pepper');
+        // 9. Super Admin creation
+        $isProduction = app()->environment('production');
+        $adminEmail = config('app.admin_email');
+        $adminPassword = config('app.admin_password');
 
-        // Super Admin: nasir@mariatutor.com / 123
+        if ($isProduction && (empty($adminEmail) || empty($adminPassword))) {
+            throw new RuntimeException('ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required in production.');
+        }
+
+        $adminEmail = $adminEmail ?: 'admin@mariatutor.pk';
+        $adminPassword = $adminPassword ?: (app()->environment('testing') ? 'AdminSecure123!' : Str::random(16));
+
+        if (! app()->environment('testing')) {
+            $this->command?->info("Seeding Super Admin: {$adminEmail}");
+            if (! config('app.admin_password')) {
+                $this->command?->warn("Generated Super Admin Password: {$adminPassword}");
+            }
+        }
+
         User::firstOrCreate([
-            'email' => 'nasir@mariatutor.com',
+            'email' => strtolower(trim((string) $adminEmail)),
         ], [
-            'identifier_hash' => $hashId('nasir@mariatutor.com'),
+            'identifier_hash' => SecurityService::hashIdentifier((string) $adminEmail, 'email'),
             'identifier_type' => 'email',
-            'name' => 'Nasir Ali (Super Admin)',
+            'name' => 'Super Administrator',
             'role' => 'super_admin',
-            'password' => Hash::make('123'),
+            'password' => Hash::make((string) $adminPassword),
             'active' => true,
             'permissions_json' => json_encode(['all' => true]),
         ]);
 
-        // Staff Admin: staff@mariatutor.com / 123
-        User::firstOrCreate([
-            'email' => 'staff@mariatutor.com',
-        ], [
-            'identifier_hash' => $hashId('staff@mariatutor.com'),
-            'identifier_type' => 'email',
-            'name' => 'Staff Administrator',
-            'role' => 'admin',
-            'password' => Hash::make('123'),
-            'active' => true,
-            'permissions_json' => json_encode(['verify_tutors' => true, 'manage_requests' => true]),
-        ]);
+        // 10. Demo Users (Local and Testing Environments only)
+        if (app()->environment('local', 'testing')) {
+            $demoStaffPassword = app()->environment('testing') ? 'StaffPass123!' : Str::random(14);
+            $demoTutorPassword = app()->environment('testing') ? 'TutorPass123!' : Str::random(14);
+            $demoParentPassword = app()->environment('testing') ? 'ParentPass123!' : Str::random(14);
 
-        // Tutor: tutor@mariatutor.com / 123 (CNIC: 36402-1111111-1)
-        $tutorUser = User::firstOrCreate([
-            'email' => 'tutor@mariatutor.com',
-        ], [
-            'identifier_hash' => $hashId('tutor@mariatutor.com'),
-            'identifier_type' => 'email',
-            'cnic_hash' => $hashId('36402-1111111-1'),
-            'name' => 'Prof. Muhammad Bilal',
-            'phone' => '03001234567',
-            'role' => 'tutor',
-            'password' => Hash::make('123'),
-            'active' => true,
-        ]);
+            if (! app()->environment('testing')) {
+                $this->command?->info("Demo Staff Admin: staff@mariatutor.com / {$demoStaffPassword}");
+                $this->command?->info("Demo Tutor: tutor@mariatutor.com / {$demoTutorPassword}");
+                $this->command?->info("Demo Parent: parent@mariatutor.com / {$demoParentPassword}");
+            }
 
-        $tutorProfile = TutorProfile::firstOrCreate([
-            'user_id' => $tutorUser->id,
-        ], [
-            'tutor_code' => 'T-BW001',
-            'full_name' => 'Prof. Muhammad Bilal',
-            'gender' => 'Male',
-            'qualification' => 'M.Sc Physics (Govt College Burewala)',
-            'experience' => '6 years teaching Matric & FSc Physics & Math',
-            'expected_fee_min' => 12000,
-            'expected_fee_max' => 20000,
-            'availability' => '4:00 PM - 8:00 PM',
-            'verification_status' => 'Approved',
-            'verification_note' => 'CNIC verified and transcripts checked.',
-            'approved_at' => now(),
-        ]);
+            // Staff Admin
+            User::firstOrCreate([
+                'email' => 'staff@mariatutor.com',
+            ], [
+                'identifier_hash' => SecurityService::hashIdentifier('staff@mariatutor.com', 'email'),
+                'identifier_type' => 'email',
+                'name' => 'Staff Administrator',
+                'role' => 'admin',
+                'password' => Hash::make($demoStaffPassword),
+                'active' => true,
+                'permissions_json' => json_encode(['verify_tutors' => true, 'manage_requests' => true]),
+            ]);
 
-        // Attach some catalog areas & subjects to Tutor
-        $tutorProfile->catalog()->syncWithoutDetaching([
-            $areaMap['Satellite Town']->id,
-            $areaMap['College Road']->id,
-            $areaMap['Model Town']->id,
-            $subjectMap['Physics']->id,
-            $subjectMap['Mathematics']->id,
-        ]);
+            // Demo Tutor 1
+            $tutorUser = User::firstOrCreate([
+                'email' => 'tutor@mariatutor.com',
+            ], [
+                'identifier_hash' => SecurityService::hashIdentifier('tutor@mariatutor.com', 'email'),
+                'identifier_type' => 'email',
+                'cnic_hash' => SecurityService::hashIdentifier('36402-1111111-1', 'cnic'),
+                'name' => 'Prof. Muhammad Bilal',
+                'phone' => '03000000001',
+                'role' => 'tutor',
+                'password' => Hash::make($demoTutorPassword),
+                'active' => true,
+            ]);
 
-        // Female Demo Tutor: ayesha.tutor@mariatutor.com / 123 (CNIC: 36402-3333333-2)
-        $tutorUser2 = User::firstOrCreate([
-            'email' => 'ayesha.tutor@mariatutor.com',
-        ], [
-            'identifier_hash' => $hashId('ayesha.tutor@mariatutor.com'),
-            'identifier_type' => 'email',
-            'cnic_hash' => $hashId('36402-3333333-2'),
-            'name' => 'Ms. Ayesha Siddiqa',
-            'phone' => '03019876543',
-            'role' => 'tutor',
-            'password' => Hash::make('123'),
-            'active' => true,
-        ]);
+            $tutorProfile = TutorProfile::firstOrCreate([
+                'user_id' => $tutorUser->id,
+            ], [
+                'tutor_code' => 'T-BW001',
+                'full_name' => 'Prof. Muhammad Bilal',
+                'gender' => 'Male',
+                'cnic_gender_hint' => 'Male',
+                'qualification' => 'M.Sc Physics (Govt College Burewala)',
+                'experience' => '6 years teaching Matric & FSc Physics & Math',
+                'expected_fee_min' => 12000,
+                'expected_fee_max' => 20000,
+                'availability' => '4:00 PM - 8:00 PM',
+                'verification_status' => 'Approved',
+                'verification_note' => 'CNIC verified and transcripts checked.',
+                'approved_at' => now(),
+            ]);
 
-        $tutorProfile2 = TutorProfile::firstOrCreate([
-            'user_id' => $tutorUser2->id,
-        ], [
-            'tutor_code' => 'T-BW002',
-            'full_name' => 'Ms. Ayesha Siddiqa',
-            'gender' => 'Female',
-            'qualification' => 'M.Phil English & B.Ed',
-            'experience' => '4 years teaching O Levels & Matric English / Biology',
-            'expected_fee_min' => 15000,
-            'expected_fee_max' => 25000,
-            'availability' => '3:00 PM - 7:00 PM',
-            'verification_status' => 'Approved',
-            'verification_note' => 'Verified female tutor for Burewala home tuition.',
-            'approved_at' => now(),
-        ]);
+            $tutorProfile->catalog()->syncWithoutDetaching([
+                $areaMap['Satellite Town']->id,
+                $areaMap['College Road']->id,
+                $areaMap['Model Town']->id,
+                $subjectMap['Physics']->id,
+                $subjectMap['Mathematics']->id,
+            ]);
 
-        $tutorProfile2->catalog()->syncWithoutDetaching([
-            $areaMap['Model Town']->id,
-            $areaMap['Gulshan-e-Rehman']->id,
-            $subjectMap['English']->id,
-            $subjectMap['Biology']->id,
-        ]);
+            // Demo Tutor 2
+            $tutorUser2 = User::firstOrCreate([
+                'email' => 'ayesha.tutor@mariatutor.com',
+            ], [
+                'identifier_hash' => SecurityService::hashIdentifier('ayesha.tutor@mariatutor.com', 'email'),
+                'identifier_type' => 'email',
+                'cnic_hash' => SecurityService::hashIdentifier('36402-3333333-2', 'cnic'),
+                'name' => 'Ms. Ayesha Siddiqa',
+                'phone' => '03000000002',
+                'role' => 'tutor',
+                'password' => Hash::make($demoTutorPassword),
+                'active' => true,
+            ]);
 
-        // Parent: parent@mariatutor.com / 123 (CNIC: 36402-2222222-1)
-        $parentUser = User::firstOrCreate([
-            'email' => 'parent@mariatutor.com',
-        ], [
-            'identifier_hash' => $hashId('parent@mariatutor.com'),
-            'identifier_type' => 'email',
-            'cnic_hash' => $hashId('36402-2222222-1'),
-            'name' => 'Chaudhry Tariq Mehmood',
-            'phone' => '03217654321',
-            'role' => 'parent',
-            'password' => Hash::make('123'),
-            'active' => true,
-        ]);
+            $tutorProfile2 = TutorProfile::firstOrCreate([
+                'user_id' => $tutorUser2->id,
+            ], [
+                'tutor_code' => 'T-BW002',
+                'full_name' => 'Ms. Ayesha Siddiqa',
+                'gender' => 'Female',
+                'cnic_gender_hint' => 'Female',
+                'qualification' => 'M.Phil English & B.Ed',
+                'experience' => '4 years teaching O Levels & Matric English / Biology',
+                'expected_fee_min' => 15000,
+                'expected_fee_max' => 25000,
+                'availability' => '3:00 PM - 7:00 PM',
+                'verification_status' => 'Approved',
+                'verification_note' => 'Verified female tutor for Burewala home tuition.',
+                'approved_at' => now(),
+            ]);
 
-        ParentProfile::firstOrCreate([
-            'user_id' => $parentUser->id,
-        ], [
-            'full_name' => 'Chaudhry Tariq Mehmood',
-        ]);
+            $tutorProfile2->catalog()->syncWithoutDetaching([
+                $areaMap['Model Town']->id,
+                $areaMap['Gulshan-e-Rehman']->id,
+                $subjectMap['English']->id,
+                $subjectMap['Biology']->id,
+            ]);
+
+            // Demo Parent
+            $parentUser = User::firstOrCreate([
+                'email' => 'parent@mariatutor.com',
+            ], [
+                'identifier_hash' => SecurityService::hashIdentifier('parent@mariatutor.com', 'email'),
+                'identifier_type' => 'email',
+                'cnic_hash' => SecurityService::hashIdentifier('36402-2222222-1', 'cnic'),
+                'name' => 'Chaudhry Tariq Mehmood',
+                'phone' => '03000000003',
+                'role' => 'parent',
+                'password' => Hash::make($demoParentPassword),
+                'active' => true,
+            ]);
+
+            ParentProfile::firstOrCreate([
+                'user_id' => $parentUser->id,
+            ], [
+                'full_name' => 'Chaudhry Tariq Mehmood',
+            ]);
+        }
     }
 }

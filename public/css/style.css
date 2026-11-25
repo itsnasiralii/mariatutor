@@ -1,9 +1,6 @@
 /* ============================================================
-   Burewala Tutor Marketplace — High Level UI
+   Maria Tutor — Burewala Tutor Marketplace UI
    ============================================================ */
-
-/* ── Google Font ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ── CSS Variables ── */
 :root {
@@ -251,8 +248,58 @@ ul { list-style: none; }
   font-weight: 700;
 }
 
-/* ── Page Content ── */
-.page-content { padding: 28px; flex: 1; }
+/* ── Page Content & Body ── */
+.page-content,
+.page-body {
+  padding: 28px;
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.app-footer {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #c7d2fe;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+}
 
 /* ══════════════════════════════════════════
    AUTH PAGES — Login / Register (no sidebar)
@@ -667,11 +714,13 @@ tr:hover td { background: #f8fafc; }
   font-weight: 600;
 }
 .badge-primary { background: #ede9fe; color: #4338ca; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger  { background: #fee2e2; color: #991b1b; }
-.badge-info    { background: #dbeafe; color: #1e40af; }
+.badge-success, .badge.green  { background: #d1fae5; color: #065f46; }
+.badge-warning, .badge.orange { background: #fef3c7; color: #92400e; }
+.badge-danger,  .badge.red    { background: #fee2e2; color: #991b1b; }
+.badge-info,    .badge.blue   { background: #dbeafe; color: #1e40af; }
 .badge-gray    { background: #f1f5f9; color: var(--muted); }
+.font-mono     { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.font-bold     { font-weight: 700; }
 .status { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: .78rem; font-weight: 600; background: #f1f5f9; color: var(--muted); }
 
 /* Forms */
@@ -750,6 +799,86 @@ input[type=checkbox] { width: auto; }
 }
 .flash.warning {
   background: #fffbeb; color: #92400e; border-color: var(--warning);
+}
+
+/* Alerts & Validation Feedback */
+.alert {
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-left: 4px solid var(--info);
+  background: #eff6ff;
+  color: #1e40af;
+}
+.alert-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left-color: var(--success);
+}
+.alert-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border-left-color: var(--danger);
+}
+.alert-warning {
+  background: #fffbeb;
+  color: #92400e;
+  border-left-color: var(--warning);
+}
+.alert ul {
+  margin: 6px 0 0 18px;
+  list-style: disc;
+}
+.alert li {
+  margin-bottom: 2px;
+}
+
+/* Pathway & Reusable Responsive Grids */
+.pathway-grid,
+.grid-two,
+.form-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.cards.one-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 20px;
+}
+.btn-logout {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+.btn-logout:hover {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+.faq-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.faq-card h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.faq-card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.55;
 }
 
 /* Notices */
@@ -1060,9 +1189,12 @@ input[type=checkbox] { width: auto; }
   }
 
   /* Grids and Cards */
-  .cards.two, .cards.three, .split {
+  .cards.two, .cards.three, .cards.one-two, .grid-two, .form-row-2, .split {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
+  }
+  .page-body {
+    padding: 16px 12px;
   }
   .pathway-grid {
     grid-template-columns: 1fr;
@@ -1174,5 +1306,25 @@ input[type=checkbox] { width: auto; }
 }
 .back-public-btn:active {
   transform: translateY(0);
+}
+
+/* ── Accessibility: Keyboard Focus & Reduced Motion ── */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

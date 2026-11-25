@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /parent
+Disallow: /tutor
+Disallow: /login
+Disallow: /healthz
+
+Sitemap: https://mariatutor.pk/sitemap.xml

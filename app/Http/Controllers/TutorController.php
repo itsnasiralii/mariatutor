@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditEvent;
 use App\Models\CatalogItem;
 use App\Models\OpportunityExposure;
-use App\Models\TutorProfile;
 use App\Models\VerificationDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,27 +12,45 @@ use Illuminate\Support\Str;
 
 class TutorController extends Controller
 {
+    public const MAX_DOCUMENTS_PER_TUTOR = 10;
+
+    public const ALLOWED_DOCUMENT_TYPES = [
+        'CNIC Front & Back',
+        'Degree / Transcript',
+        'Experience Certificate',
+        'Other',
+    ];
+
     public function dashboard()
     {
         $user = Auth::user();
         $profile = $user->tutorProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return redirect()->route('home')->with('error', 'Tutor profile not found.');
         }
+
+        $stats = [
+            'total_exposures' => OpportunityExposure::where('tutor_id', $profile->id)->count(),
+            'interested_count' => OpportunityExposure::where('tutor_id', $profile->id)->whereNotNull('interested_at')->count(),
+        ];
 
         $exposures = OpportunityExposure::with(['request.area', 'request.subject', 'request.schoolClass', 'request.mode'])
             ->where('tutor_id', $profile->id)
             ->orderBy('shown_at', 'desc')
-            ->get();
+            ->paginate(15);
 
         $documents = $profile->documents()->orderBy('created_at', 'desc')->get();
 
-        return view('tutor.dashboard', compact('user', 'profile', 'exposures', 'documents'));
+        return view('tutor.dashboard', compact('user', 'profile', 'exposures', 'documents', 'stats'));
     }
 
     public function expressInterest(Request $request, $id)
     {
+        $request->validate([
+            'interest_note' => 'nullable|string|max:240',
+        ]);
+
         $user = Auth::user();
         $profile = $user->tutorProfile;
 
@@ -72,14 +90,15 @@ class TutorController extends Controller
             'full_name' => 'required|string|max:120',
             'qualification' => 'nullable|string|max:200',
             'experience' => 'nullable|string|max:500',
-            'expected_fee_min' => 'nullable|numeric',
-            'expected_fee_max' => 'nullable|numeric',
+            'expected_fee_min' => 'nullable|integer|min:0|max:500000',
+            'expected_fee_max' => 'nullable|integer|min:0|max:500000|gte:expected_fee_min',
             'availability' => 'nullable|string|max:300',
             'catalog_ids' => 'nullable|array',
+            'catalog_ids.*' => 'integer|exists:catalog_items,id',
         ]);
 
         $profile->update([
-            'full_name' => $request->full_name,
+            'full_name' => trim((string) $request->full_name),
             'qualification' => $request->qualification,
             'experience' => $request->experience,
             'expected_fee_min' => $request->expected_fee_min,
@@ -87,9 +106,7 @@ class TutorController extends Controller
             'availability' => $request->availability,
         ]);
 
-        if ($request->has('catalog_ids')) {
-            $profile->catalog()->sync($request->catalog_ids);
-        }
+        $profile->catalog()->sync($request->input('catalog_ids', []));
 
         return redirect()->route('tutor.dashboard')->with('success', 'Profile updated successfully.');
     }
@@ -97,24 +114,40 @@ class TutorController extends Controller
     public function uploadDocument(Request $request)
     {
         $request->validate([
-            'document_type' => 'required|string|max:32',
+            'document_type' => 'required|string|max:32|in:'.implode(',', self::ALLOWED_DOCUMENT_TYPES),
             'document_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:8192',
         ]);
 
         $user = Auth::user();
         $profile = $user->tutorProfile;
 
-        $file = $request->file('document_file');
-        $storedName = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->storeAs('private_documents', $storedName);
+        if ($profile->documents()->count() >= self::MAX_DOCUMENTS_PER_TUTOR) {
+            return back()->with('error', 'You have reached the maximum limit of '.self::MAX_DOCUMENTS_PER_TUTOR.' verification documents.');
+        }
 
-        VerificationDocument::create([
+        $file = $request->file('document_file');
+        $detectedExtension = strtolower((string) ($file->extension() ?: 'bin'));
+        $storedName = Str::uuid().'.'.$detectedExtension;
+
+        $file->storeAs('private_documents', $storedName, 'local');
+
+        $cleanOriginalName = mb_substr(basename((string) $file->getClientOriginalName()), 0, 200);
+
+        $doc = VerificationDocument::create([
             'tutor_id' => $profile->id,
             'document_type' => $request->document_type,
-            'original_name' => $file->getClientOriginalName(),
+            'original_name' => $cleanOriginalName ?: ('document.'.$detectedExtension),
             'stored_name' => $storedName,
             'review_status' => 'Pending',
+            'uploaded_at' => now(),
         ]);
+
+        AuditEvent::record(
+            'document_uploaded',
+            'verification_document',
+            $doc->id,
+            "Tutor {$profile->tutor_code} uploaded '{$doc->document_type}'."
+        );
 
         return back()->with('success', 'Document uploaded securely. Our verification team will review it within 24 hours.');
     }

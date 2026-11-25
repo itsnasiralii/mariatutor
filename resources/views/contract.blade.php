@@ -1,7 +1,9 @@
 @extends('layouts.base')
 
-@section('title', 'Safeguarding, Child Protection & Code of Conduct — Maria Tutor')
+@section('title', 'Tuition Agreement & Safeguarding | Maria Tutor')
 @section('page_title', 'Safeguarding & Code of Conduct Contract')
+@section('meta_description', 'Read the Maria Tutor Burewala child safeguarding charter, code of conduct, anti-bypass rules, and legal protections for parents, students, and tutors.')
+@section('canonical', route('contract'))
 
 @section('content')
 <div class="contract-container" style="max-width: 1040px; margin: 0 auto; padding: 20px 0;">
