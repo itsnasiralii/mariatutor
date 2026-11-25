@@ -32,9 +32,15 @@ class HomeController extends Controller
         $areas = CatalogItem::where('kind', 'area')->where('active', true)->orderBy('sort_order')->get();
         $subjects = CatalogItem::where('kind', 'subject')->where('active', true)->orderBy('sort_order')->get();
         $tutorCount = TutorProfile::where('verification_status', VerificationStatus::Approved->value)->count();
+        $featuredTutors = TutorProfile::select(self::PUBLIC_TUTOR_COLUMNS)
+            ->with(['catalog:id,kind,name'])
+            ->where('verification_status', VerificationStatus::Approved->value)
+            ->orderBy('tutor_code')
+            ->take(6)
+            ->get();
         $settings = SystemSetting::all()->pluck('value', 'key');
 
-        return view('index', compact('areas', 'subjects', 'tutorCount', 'settings'));
+        return view('index', compact('areas', 'subjects', 'tutorCount', 'featuredTutors', 'settings'));
     }
 
     public function exploreTutors(Request $request)
@@ -68,7 +74,7 @@ class HomeController extends Controller
             $query->where('gender', $request->gender);
         }
 
-        $tutors = $query->orderBy('id', 'desc')->paginate(12)->withQueryString();
+        $tutors = $query->orderBy('tutor_code')->paginate(12)->withQueryString();
 
         return view('explore_tutors', compact('tutors', 'areas', 'subjects'));
     }

@@ -7,7 +7,6 @@ use App\Models\CatalogItem;
 use App\Models\CommissionRule;
 use App\Models\ParentProfile;
 use App\Models\SystemSetting;
-use App\Models\TutorProfile;
 use App\Models\User;
 use App\Services\SecurityService;
 use Illuminate\Database\Seeder;
@@ -217,15 +216,16 @@ class DatabaseSeeder extends Seeder
             'permissions_json' => json_encode(['all' => true]),
         ]);
 
-        // 10. Demo Users (Local and Testing Environments only)
+        // 10. Seed 25 Burewala Showcase Educators (non-privileged tutor profiles with random passwords)
+        $this->call(ShowcaseTutorSeeder::class);
+
+        // 11. Demo Staff & Parent Users (Local and Testing Environments only)
         if (app()->environment('local', 'testing')) {
             $demoStaffPassword = app()->environment('testing') ? 'StaffPass123!' : Str::random(14);
-            $demoTutorPassword = app()->environment('testing') ? 'TutorPass123!' : Str::random(14);
             $demoParentPassword = app()->environment('testing') ? 'ParentPass123!' : Str::random(14);
 
             if (! app()->environment('testing')) {
                 $this->command?->info("Demo Staff Admin: staff@mariatutor.com / {$demoStaffPassword}");
-                $this->command?->info("Demo Tutor: tutor@mariatutor.com / {$demoTutorPassword}");
                 $this->command?->info("Demo Parent: parent@mariatutor.com / {$demoParentPassword}");
             }
 
@@ -240,83 +240,6 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make($demoStaffPassword),
                 'active' => true,
                 'permissions_json' => json_encode(['verify_tutors' => true, 'manage_requests' => true]),
-            ]);
-
-            // Demo Tutor 1
-            $tutorUser = User::firstOrCreate([
-                'email' => 'tutor@mariatutor.com',
-            ], [
-                'identifier_hash' => SecurityService::hashIdentifier('tutor@mariatutor.com', 'email'),
-                'identifier_type' => 'email',
-                'cnic_hash' => SecurityService::hashIdentifier('36402-1111111-1', 'cnic'),
-                'name' => 'Prof. Muhammad Bilal',
-                'phone' => '03000000001',
-                'role' => 'tutor',
-                'password' => Hash::make($demoTutorPassword),
-                'active' => true,
-            ]);
-
-            $tutorProfile = TutorProfile::firstOrCreate([
-                'user_id' => $tutorUser->id,
-            ], [
-                'tutor_code' => 'T-BW001',
-                'full_name' => 'Prof. Muhammad Bilal',
-                'gender' => 'Male',
-                'cnic_gender_hint' => 'Male',
-                'qualification' => 'M.Sc Physics (Govt College Burewala)',
-                'experience' => '6 years teaching Matric & FSc Physics & Math',
-                'expected_fee_min' => 12000,
-                'expected_fee_max' => 20000,
-                'availability' => '4:00 PM - 8:00 PM',
-                'verification_status' => 'Approved',
-                'verification_note' => 'CNIC verified and transcripts checked.',
-                'approved_at' => now(),
-            ]);
-
-            $tutorProfile->catalog()->syncWithoutDetaching([
-                $areaMap['Satellite Town']->id,
-                $areaMap['College Road']->id,
-                $areaMap['Model Town']->id,
-                $subjectMap['Physics']->id,
-                $subjectMap['Mathematics']->id,
-            ]);
-
-            // Demo Tutor 2
-            $tutorUser2 = User::firstOrCreate([
-                'email' => 'ayesha.tutor@mariatutor.com',
-            ], [
-                'identifier_hash' => SecurityService::hashIdentifier('ayesha.tutor@mariatutor.com', 'email'),
-                'identifier_type' => 'email',
-                'cnic_hash' => SecurityService::hashIdentifier('36402-3333333-2', 'cnic'),
-                'name' => 'Ms. Ayesha Siddiqa',
-                'phone' => '03000000002',
-                'role' => 'tutor',
-                'password' => Hash::make($demoTutorPassword),
-                'active' => true,
-            ]);
-
-            $tutorProfile2 = TutorProfile::firstOrCreate([
-                'user_id' => $tutorUser2->id,
-            ], [
-                'tutor_code' => 'T-BW002',
-                'full_name' => 'Ms. Ayesha Siddiqa',
-                'gender' => 'Female',
-                'cnic_gender_hint' => 'Female',
-                'qualification' => 'M.Phil English & B.Ed',
-                'experience' => '4 years teaching O Levels & Matric English / Biology',
-                'expected_fee_min' => 15000,
-                'expected_fee_max' => 25000,
-                'availability' => '3:00 PM - 7:00 PM',
-                'verification_status' => 'Approved',
-                'verification_note' => 'Verified female tutor for Burewala home tuition.',
-                'approved_at' => now(),
-            ]);
-
-            $tutorProfile2->catalog()->syncWithoutDetaching([
-                $areaMap['Model Town']->id,
-                $areaMap['Gulshan-e-Rehman']->id,
-                $subjectMap['English']->id,
-                $subjectMap['Biology']->id,
             ]);
 
             // Demo Parent

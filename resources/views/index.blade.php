@@ -181,6 +181,70 @@
   </section>
 
   <!-- How it Works -->
+  @if(isset($featuredTutors) && count($featuredTutors) > 0)
+  <section class="features-section" style="padding-bottom: 12px;">
+    <p class="eyebrow" style="text-align:center;margin-bottom:8px;">MEET OUR EDUCATORS</p>
+    <h2 style="text-align:center;margin-bottom:12px;">Featured Verified Tutors in {{ $cityName }}</h2>
+    <p style="text-align:center;color:var(--muted);max-width:640px;margin:0 auto 32px;">
+      Browse qualified male and female subject specialists across {{ $cityName }}. Request a coordinated trial demo class with any educator.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px; margin-bottom: 28px;">
+      @foreach($featuredTutors as $tutor)
+        <article class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 12px;">
+              <div>
+                <span class="badge badge-primary font-mono">{{ $tutor->tutor_code }}</span>
+                <h3 style="margin: 6px 0 2px 0; font-size:1.12rem; color:#1e293b;">{{ $tutor->full_name }}</h3>
+                <span style="font-size:0.82rem; color:#64748b;">{{ $tutor->gender }} Tutor</span>
+              </div>
+              <span class="badge badge-success">✓ Verified</span>
+            </div>
+
+            <p style="font-size:0.85rem; color:#475569; margin-bottom:8px;"><strong><span aria-hidden="true">🎓</span> Qualification:</strong> {{ $tutor->qualification }}</p>
+            <p style="font-size:0.85rem; color:#475569; margin-bottom:10px;"><strong><span aria-hidden="true">💼</span> Experience:</strong> {{ $tutor->experience }}</p>
+
+            @if($tutor->expected_fee_min)
+              <p style="font-size:0.85rem; color:#15803d; font-weight:700; margin-bottom:10px;">
+                <span aria-hidden="true">💰</span> Expected Fee: PKR {{ number_format($tutor->expected_fee_min) }} – {{ number_format($tutor->expected_fee_max) }} / month
+              </p>
+            @endif
+
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:8px;">
+              @foreach($tutor->catalog as $item)
+                @if(in_array($item->kind, ['area', 'subject']))
+                  <a href="{{ route('tutors.landing', \Illuminate\Support\Str::slug($item->name)) }}" style="font-size:0.74rem; background:#f1f5f9; color:#334155; padding:3px 8px; border-radius:4px;">
+                    <span aria-hidden="true">{{ $item->kind === 'area' ? '📍' : '📖' }}</span> {{ $item->name }}
+                  </a>
+                @endif
+              @endforeach
+            </div>
+          </div>
+
+          <div style="margin-top: 18px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+            @if(Auth::check() && Auth::user()->isParent())
+              <a href="{{ route('parent.request_new', ['tutor_id' => $tutor->id]) }}" class="btn btn-primary" style="width:100%; justify-content:center;">
+                Request Trial Demo Class →
+              </a>
+            @else
+              <a href="{{ route('auth.register_parent') }}" class="btn btn-primary" style="width:100%; justify-content:center;">
+                Request Trial Demo Class →
+              </a>
+            @endif
+          </div>
+        </article>
+      @endforeach
+    </div>
+
+    <div style="text-align:center;">
+      <a href="{{ route('explore.tutors') }}" class="btn btn-primary" style="padding: 12px 28px; font-size: 0.96rem;">
+        Explore All {{ $tutorCount }} Verified Tutors in {{ $cityName }} →
+      </a>
+    </div>
+  </section>
+  @endif
+
   <section class="features-section">
     <p class="eyebrow" style="text-align:center;margin-bottom:8px;">HOW IT WORKS</p>
     <h2>A platform-managed introduction</h2>

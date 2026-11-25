@@ -556,6 +556,22 @@ class MariaTutorTest extends TestCase
 
         $this->assertGreaterThanOrEqual(12, CatalogItem::where('kind', 'area')->count());
         $this->assertGreaterThan(0, AreaAdjacency::count());
+        $this->assertSame(25, TutorProfile::where('verification_status', VerificationStatus::Approved->value)->count());
+
+        // Explore page renders paginated showcase tutors cleanly with custom pagination
+        $explorePage1 = $this->get('/explore-tutors');
+        $explorePage1->assertStatus(200)
+            ->assertSee('T-BW001')
+            ->assertSee('Showing')
+            ->assertSee('page=2', false);
+
+        $this->get('/explore-tutors?page=3')
+            ->assertStatus(200)
+            ->assertSee('T-BW025');
+
+        // Standalone artisan command is idempotent
+        $this->artisan('tutors:seed-showcase')->assertExitCode(0);
+        $this->assertSame(25, TutorProfile::where('verification_status', VerificationStatus::Approved->value)->count());
 
         // Rotate CNIC_HASH_KEY and verify rehash command updates email/phone hashes cleanly
         $user = User::where('identifier_type', 'email')->firstOrFail();
