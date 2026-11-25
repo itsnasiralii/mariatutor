@@ -162,7 +162,7 @@ ul { list-style: none; }
 .sidebar-footer .user-role { font-size: .72rem; color: #818cf8; }
 
 /* ── Main Content ── */
-.main-wrap {
+.main-wrap, .main-wrapper {
   margin-left: var(--sidebar-w);
   flex: 1;
   display: flex;
@@ -986,7 +986,7 @@ input[type=checkbox] { width: auto; }
   .sidebar-toggle-btn {
     display: inline-flex;
   }
-  .main-wrap {
+  .main-wrap, .main-wrapper {
     margin-left: 0;
   }
   .topbar {

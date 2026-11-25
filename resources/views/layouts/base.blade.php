@@ -21,7 +21,13 @@
         <div class="icon">🎓</div>
         <div>
           <div>Maria Tutor</div>
-          <small>Administration</small>
+          <small>
+            @if(Auth::user()->isParent()) Parent Portal
+            @elseif(Auth::user()->isTutor()) Tutor Portal
+            @elseif(Auth::user()->isSuperAdmin()) Super Admin
+            @elseif(Auth::user()->isAdmin()) Administration
+            @else Portal @endif
+          </small>
         </div>
       </a>
       <button type="button" class="sidebar-close-btn" id="sidebarClose" aria-label="Close sidebar">✕</button>
@@ -113,7 +119,7 @@
   </aside>
 
   <!-- Main Content Wrapper -->
-  <div class="main-wrapper">
+  <div class="main-wrap">
     <!-- Topbar -->
     <header class="topbar">
       <div style="display: flex; align-items: center; gap: 12px;">

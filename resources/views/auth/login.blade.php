@@ -6,21 +6,17 @@
 <div class="auth-page">
   <div class="auth-card" style="max-width: 480px;">
 
+    @if($portal != 'admin')
     <!-- Portal Switch Tabs -->
-    <div style="display:flex; gap:6px; margin-bottom: 20px; background: var(--bg, #f1f5f9); padding: 4px; border-radius: 8px; font-size: 0.82rem;">
-      <a href="{{ route('login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {{ !$portal ? 'background:white; color:#0284c7; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
-        🌐 All
+    <div style="display:flex; gap:6px; margin-bottom: 20px; background: var(--bg, #f1f5f9); padding: 4px; border-radius: 8px; font-size: 0.85rem;">
+      <a href="{{ route('auth.parent_login') }}" style="flex:1; text-align:center; padding: 8px 6px; border-radius: 6px; text-decoration:none; font-weight:700; {{ $portal != 'tutor' ? 'background:white; color:#d97706; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
+        👨‍👩‍👧 Parent Portal
       </a>
-      <a href="{{ route('auth.tutor_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {{ $portal == 'tutor' ? 'background:white; color:#059669; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
-        🎓 Tutor
-      </a>
-      <a href="{{ route('auth.parent_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {{ $portal == 'parent' ? 'background:white; color:#d97706; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
-        👨‍👩‍👧 Parent
-      </a>
-      <a href="{{ route('auth.admin_login') }}" style="flex:1; text-align:center; padding: 6px 4px; border-radius: 6px; text-decoration:none; font-weight:600; {{ $portal == 'admin' ? 'background:white; color:#dc2626; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
-        🛡️ Admin
+      <a href="{{ route('auth.tutor_login') }}" style="flex:1; text-align:center; padding: 8px 6px; border-radius: 6px; text-decoration:none; font-weight:700; {{ $portal == 'tutor' ? 'background:white; color:#059669; box-shadow:0 1px 3px rgba(0,0,0,0.1);' : 'color:#64748b;' }}">
+        🎓 Tutor Portal
       </a>
     </div>
+    @endif
 
     <div class="auth-logo">
       <div class="logo-icon">

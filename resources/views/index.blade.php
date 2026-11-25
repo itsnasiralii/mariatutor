@@ -191,8 +191,7 @@
 
   <footer class="home-footer">
     <span>© 2026 Maria Tutor · All Rights Reserved</span> &nbsp;·&nbsp;
-    <a href="{{ route('privacy') }}">Privacy &amp; Safety</a> &nbsp;·&nbsp;
-    <a href="{{ route('auth.admin_login') }}" target="_blank" style="color:#64748b; font-size:0.82rem;">🛡️ Staff &amp; Administration</a>
+    <a href="{{ route('privacy') }}">Privacy &amp; Safety</a>
   </footer>
 </div>
 @endsection

@@ -50,9 +50,6 @@
           <a href="{{ route('auth.tutor_login') }}" target="_blank" class="nav-link nav-link-tutor">
             <span class="nav-icon">🎓</span> Tutor Portal
           </a>
-          <a href="{{ route('auth.admin_login') }}" target="_blank" class="nav-link nav-link-staff">
-            <span class="nav-icon">🛡️</span> Staff
-          </a>
         @endif
       </div>
 
